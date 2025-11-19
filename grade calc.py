@@ -17,7 +17,7 @@ class GradeSystem:
         self.student_id = student_id
         self.course = course
         self.marks = marks
-        self.grade = self.grade_conversion_letter()
+        self.grade = self.grade_conversion_letter()     # auto conversion grade + grade point
         self.grade_point = self.grade_conversion_point(self.grade)
 
     def grade_conversion_letter(self):
@@ -63,7 +63,7 @@ class GradeManager:
         grade = GradeSystem(student_id, course_id, marks)
         self.grades.append(grade)
 
-    def read_students(self, filename ="students.txt"):
+    def read_students(self, filename ="students.txt"):  # txt format A | B | C
         try:
             with open(filename, "r") as file:
                 for line in file:
@@ -71,9 +71,9 @@ class GradeManager:
                     if not line:
                         continue
 
-                    parts = [p.strip() for p in line.split('|')]
+                    parts = [p.strip() for p in line.split('|')]    # should be changed to , (delete empty spaces)
 
-                    student_id, student_name, email, current_semester = parts[:4]
+                    student_id, student_name, email, current_semester = parts[:4]   # ignore var after 3rd
                     self.add_students(student_id, student_name, email, current_semester)
 
             print("Loaded successfully!")
@@ -101,8 +101,8 @@ class GradeManager:
         try:
             with open(filename, "r") as f:
                 for line in f:
-                    line = line.strip()     ##remove spaces btw chars
-                    if not line:            ##skip if empty line
+                    line = line.strip()     ## remove spaces btw chars
+                    if not line:            ## skip if empty line
                         continue
 
                     parts = [p.strip() for p in line.split('|')]
@@ -117,7 +117,7 @@ class GradeManager:
 
     def update_marks(self, student_id, course_id,  new_marks):
         for grade in self.grades:
-            if grade.student_id == student_id and grade.course_id == course_id:
+            if grade.student_id == student_id and grade.course_id == course_id: #
                 grade.marks = new_marks
                 grade.grade = grade.grade_conversion_letter()
                 grade.grade_point = grade.grade_conversion_letter(grade.grade)
@@ -139,7 +139,7 @@ class GradeManager:
     """
 
 
-
+# main function for users
 if __name__ == "__main__":
     gm = GradeManager()
 
@@ -151,3 +151,4 @@ if __name__ == "__main__":
 
 
 
+## missing delete, gpa + cgpa for semesters calc, save function
