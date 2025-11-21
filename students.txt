@@ -1,30 +1,30 @@
-509-001-001 | Syed Bin Syed Nizam | 509001@student.edu.my | Semester 3
-509-001-002 | Fong Jun Li | 509002@student.edu.my | Semester 2
-509-001-003 | Murugan A/L Ravendahraan | 509003@student.edu.my | Semester 4
-509-001-004 | Kavinash Sagarnesh | 509004@student.edu.my | Semester 5
-509-001-005 | Sylvester Lim | 509005@student.edu.my | Semester 1
-509-001-006 | Kirteekgeran A/L Subramaniam | 509006@student.edu.my | Semester 6
-509-001-007 | Haikal Hassan | 509007@student.edu.my | Semester 3
-509-001-008 | Keevan Roy Sanjeev | 509008@student.edu.my | Semester 2
-509-001-009 | Kishen Rey Sanjeev | 509009@student.edu.my | Semester 7
-509-001-010 | Keenan Raj Sanjeev | 509010@student.edu.my | Semester 5
-509-001-011 | Kesaavan Nair | 509011@student.edu.my | Semester 1
-509-001-012 | Kishaan Manimaren | 509012@student.edu.my | Semester 2
-509-001-013 | Thorgesh A/L Kanagesawaran | 509013@student.edu.my | Semester 3
-509-001-014 | Muhammad Shafizal | 509014@student.edu.my | Semester 4
-509-001-015 | Chen Yang | 509015@student.edu.my | Semester 6
-509-001-016 | Yusuff Ariff | 509016@student.edu.my | Semester 5
-509-001-017 | Sarah Fong | 509017@student.edu.my | Semester 2
-509-001-018 | Jasmine Lim | 509018@student.edu.my | Semester 3
-509-001-019 | Jaishanaa Athi | 509019@student.edu.my | Semester 4
-509-001-020 | Sanjay Saachi | 509020@student.edu.my | Semester 1
-509-001-021 | Alyssa Lee | 509021@student.edu.my | Semester 7
-509-001-022 | Suresh Raj A/L Vijayan | 509022@student.edu.my | Semester 6
-509-001-023 | Adam Bin Mohd Faizal | 509023@student.edu.my | Semester 5
-509-001-024 | Abdul Malik | 509024@student.edu.my | Semester 3
-509-001-025 | Justin Kai | 509025@student.edu.my | Semester 4
-509-001-026 | Jensen Huang | 509026@student.edu.my | Semester 2
-509-001-027 | Tim Cook | 509027@student.edu.my | Semester 1
-509-001-028 | Kartikaya Singh | 509028@student.edu.my | Semester 6
-509-001-029 | Affif Muhammad | 509029@student.edu.my | Semester 5
-509-001-030 | Melissa Wong | 509030@student.edu.my | Semester 3
+509001,Syed Bin Syed Nizam,509001@student.edu.my,3
+509002,Fong Jun Li,509002@student.edu.my,2
+509003,Murugan A/L Ravendahraan,509003@student.edu.my,4
+509004,Kavinash Sagarnesh,509004@student.edu.my,5
+509005,Sylvester Lim,509005@student.edu.my,1
+509006,Kirteekgeran A/L Subramaniam,509006@student.edu.my,6
+509007,Haikal Hassan,509007@student.edu.my,3
+509008,Keevan Roy Sanjeev,509008@student.edu.my,2
+509009,Kishen Rey Sanjeev,509009@student.edu.my,7
+509010,Keenan Raj Sanjeev,509010@student.edu.my,5
+509011,Kesaavan Nair,509011@student.edu.my,1
+509012,Kishaan Manimaren,509012@student.edu.my,2
+509013,Thorgesh A/L Kanagesawaran,509013@student.edu.my,3
+509014,Muhammad Shafizal,509014@student.edu.my,4
+509015,Chen Yang,509015@student.edu.my,6
+509016,Yusuff Ariff,509016@student.edu.my,5
+509017,Sarah Fong,509017@student.edu.my,2
+509018,Jasmine Lim,509018@student.edu.my,3
+509019,Jaishanaa Athi,509019@student.edu.my,4
+509020,Sanjay Saachi,509020@student.edu.my,1
+509021,Alyssa Lee,509021@student.edu.my,7
+509022,Suresh Raj A/L Vijayan,509022@student.edu.my,6
+509023,Adam Bin Mohd Faizal,509023@student.edu.my,5
+509024,Abdul Malik,509024@student.edu.my,3
+509025,Justin Kai,509025@student.edu.my,4
+509026,Jensen Huang,509026@student.edu.my,2
+509027,Tim Cook,509027@student.edu.my,1
+509028,Kartikaya Singh,509028@student.edu.my,6
+509029,Mikhael Muhammad,509029@student.edu.my,5
+509030,Melissa Wong,509030@student.edu.my,3
