@@ -26,7 +26,6 @@ def read_file(file_name):
     
 #Function for delete student
 def delete_student(stu_id):
-
     #Reading all student lines.
     students = read_file("students.txt")
     new_list = []
@@ -51,7 +50,7 @@ def delete_student(stu_id):
         for item in new_grade_list:
             f.write(item + "\n")
 
-    print("student deleted")
+    print("Student deleted succesfully")
 
 #Function for delete courses
 def delete_course(course_id): 
@@ -73,7 +72,7 @@ def delete_course(course_id):
     new_grade_list = []
 
     for g in grades:
-        parts = g.split("|")
+        parts = g.split(",")
         c_id = parts[1].strip()
 
         if c_id != course_id:
@@ -83,49 +82,114 @@ def delete_course(course_id):
         for item in new_grade_list:
             f.write(item + "\n")
 
-    print("course deleted")
+    print("Course deleted sucessfully")
 
-#Main function
+
+# =================================================================================
+#Part 2 Goyu
+#check if student exist or no, if exist already, become true
+def student_exist(stu_id):
+    student=read_file('students.txt')
+    for s in student:
+       parts=s.split(',')
+       if parts[0].strip()== stu_id:
+           return True
+    return False
+#check if course exist or no, if exist, then become true
+def course_exist(course_id):
+    course= read_file('courses.txt')
+    for c in course:
+        parts= c.split(',')
+        if parts[0].strip() == course_id:
+            return True
+    return False
+
+#Function to add student
+def add_student():
+    stu_id=input('Input student ID to add: ').strip()
+    if student_exist(stu_id):
+        print('ERROR! Student already exist')
+        return
+    name=input('Enter student name: ').strip()
+    email=input('Enter student email: ').strip()
+    semester=input('Enter the semester of student: ').strip()
+    newstu= f"{stu_id},{name},{email},{semester}"
+    write_file('students.txt',[newstu])
+    print('Student added succesfully')
+#Function to delete student 
+def delete_student_menu():
+    stu_id=input('Please input student ID to be deleted: ').strip()
+    if not student_exist(stu_id):
+        print("ERROR! Student doesn't exist")
+        return
+    delete_student(stu_id)
+#function to delete course
+def delete_course_menu():
+    course_id=input('Please input course ID to be deleted: ').strip()
+    if not course_exist(course_id):
+        print("ERROR! Course doesn't exist")
+        return
+    delete_course(course_id)
+
+#function to add course
+def add_course():
+    course_id=input('Input new course ID: ').strip()
+    if course_exist(course_id):
+        print('ERROR! Course already exist')
+        return
+    coursename=input('Enter course name: ').strip()
+    new_course=f"{course_id},{coursename}"
+    write_file("courses.txt", [new_course])
+    print('Course added successfully')
+#search course
+def search_course():
+    keyw= input('Enter Course ID or Name to Search: ').strip().lower()
+    courses= read_file('courses.txt')
+    found= False
+    for x in courses:
+        if keyw in x.lower():
+            print(x)
+            found= True
+    if not found:
+        print('No matching course found in database')
+#search_student
+def search_student():
+    keyw = input("Enter Student ID or Name to search: ").strip().lower()
+    students=read_file('students.txt')
+    found= False
+    for c in students:
+        if keyw in c.lower():
+            print(c)
+            found = True
+
+        if not found:
+           print('No matching student found in database')
+
+
+#Main Menu function
 def main():
-
-    #Example student data
-    students = [
-        "509-001-031 | Yersh Poorvasaran | 509031@student.edu.my | Semester 3",
-        "509-001-032 | Marcus Chong | 509032@student.edu.my | Semester 2",
-        "509-001-033 | David Lim | 509033@student.edu.my | Semester 4",
-    ]
-
-    courses = [
-    "CSC101 | Programming Fundamentals",
-    "CSC102 | Data Structures and Algorithms",
-    "CSC103 | Database Systems",
-    ]
-
-    grades = [
-    "509-001-031 | CSC101 | 88 | A | 4.0",
-    "509-001-032 | CSC102 | 76 | B+ | 3.3",
-    "509-001-033 | CSC103 | 67 | B | 3.0",
-    ]
-
-    write_file("students.txt", students)
-    write_file("courses.txt", courses)
-    write_file("grades.txt", grades)
-
-    students_data = read_file("students.txt")
-    courses_data = read_file("courses.txt")
-    grades_data = read_file("grades.txt")
-
-    print("\n--- Students ---")
-    for s in students_data:
-        print(s)
-
-    print("\n--- Courses ---")
-    for c in courses_data:
-        print(c)
-
-    print("\n--- Grades ---")
-    for g in grades_data:
-        print(g)
+    print('Choose an option ')
+    print('1. Add Student')
+    print('2. Delete Student')
+    print('3. Add Course')
+    print('4. Delete Course')
+    print('5. Search Student')
+    print('6. Search Course')
+    choice= int(input('Choose 1-4: '))
+    if choice == 1:
+        add_student()
+    elif choice == 2:
+        delete_student_menu()
+    elif choice == 3:
+        add_course()
+    elif choice == 4:
+        delete_course_menu()
+    elif choice == 5:
+        search_student()
+    elif choice == 6:
+        search_course()
+    else:
+        print('Invalid Input')
 
 if __name__ == "__main__":
     main()
