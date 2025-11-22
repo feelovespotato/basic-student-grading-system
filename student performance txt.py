@@ -100,11 +100,16 @@ def file_path(*path_parts):
     folder_basepath = os.path.dirname(__file__)
     return os.path.join(folder_basepath,*path_parts)
 
-def export_performance_report(users):
+def export_performance_report(id,semester,users):
+    student= users[id]
+    courses = loadcourse_file(semester)
+    grades = loadgrade_file(id)
+    semester_grades = [g for g in grades if g["semester"] == semester]
+
     while True:
         export_or_not = input("do you want to export you performance summary file? (please answer yes or no): ").strip()
         if str(export_or_not.lower()) == "yes":
-            question_forexport(users)
+            question_forexport(id)
             i=0
             while True: #for checking the num of file exist
                 performance_summarytxt= f"student performance summary({i}).txt"
@@ -134,31 +139,31 @@ def export_performance_report(users):
             time.sleep(1)
             clear_terminal()
     
-def question_forexport(users):
+def question_forexport(id):
     while True:
-        id = input("please enter your id (example: 12114545): ").strip()
+        inputid = input("please enter your id (example: 12114545): ").strip()
 
         if id.lower() == "quit":
             exit_program()
     
-        if id in users:
+        if inputid in id:
             print("Please check information below:")
-            print(f"id: {id}")
-            print(f"name: {users[id]['name']}")
-            print(f"email: {users[id]['email']}")
-            print(f"current semester: {users[id]['semester']}")
+            print(f"id: {inputid}")
+            print(f"name: {id[inputid]['name']}")
+            print(f"email: {id[inputid]['email']}")
+            print(f"current semester: {id[inputid]['semester']}")
 
             #ask for semester
             while True:
                 semester = input("please enter semester that you want to export (example: 1, 2, 3...): ").strip()
                 if semester.isdigit(): #CHECKKKKK
                     semester = int(semester)
-                    if semester <= users[id]["semester"]:
+                    if semester <= id[inputid]["semester"]:
                         print(f"semester {semester}")
                         loadcourse_file()
                         #print(f"id: {course[id]}")
-                        print(f"name: {users[id]['name']}")
-                        print(f"email: {users[id]['email']}")
+                        print(f"name: {id[inputid]['name']}")
+                        print(f"email: {id[inputid]['email']}")
                         
 
                         break
