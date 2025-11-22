@@ -22,19 +22,22 @@ def clear_terminal():
               if os.name == "nt" #check the operating system (nt=windows)
               else "clear") #all the rest is mac/linux
     
-student_list = []
+
 def loaddstudent_file():
+    users = {}
     with open("student.txt","r") as file :
         data = file.readlines()
-        users = {}
-    for i in data[1:]:
-        i.strip()
+    
+    for i in data:
+        i=i.strip()
         spliting = i.split(',')
-        id = spliting[0]
+
+        studentid_infile = spliting[0]
         name= spliting[1]
         email = spliting[2]
-        semester = spliting[3]
-        users[id] = {
+        semester = int(spliting[3])
+        
+        users[studentid_infile ] = {
             "name": name,
             "email": email,
             "semester": semester,
@@ -43,40 +46,51 @@ def loaddstudent_file():
         }
     return users
 
-def loadcourse_file():
+def loadcourse_file(semester):
+    courses = [] # make it as a list bc one student has many subject (can store many dictionary)
+
     with open("course.txt","r") as file:
         data= file.readlines()
     
-    for i in data[1:]:
-        i.strip()
+    for i in data:
+        i=i.strip()
         spliting = i.split(',')
-        id = spliting[0]
-        semester = spliting[1]
-        course_num= spliting[2]
-        course_name = spliting[3]
+
+        course_num= spliting[0]
+        course_name = spliting[1]
+        sem = int(spliting[2])
+
+        if sem == semester : # filterrrr
+            courses.append({ 
+                "course_code": course_num,
+                "course_name": course_name})
+    return courses
 
 
-def loadgrade_file(users):
+def loadgrade_file(id):
+    grades= []
+
     with open("grade.txt","r") as file :
         data = file.readlines()
     
-    for i in data[1:]:
-        i.strip()
+    for i in data:
+        i=i.strip()
         spliting = i.split(',')
-        id = spliting[0]
-        course_num= spliting[1]
-        marks = spliting[2]
-        grade = spliting[3]
-        gpa = spliting [4]
+        studentid_infile = spliting[0]
+        grade_sem = int(spliting[1])
+        course_num= spliting[2]
+        marks = spliting[3]
+        grade = spliting[4]
+        gpa = spliting [5]
             #get student id from part 2 
-        if id in users:
-            users[id]["grades"].append({
-            "course_num": course_num,
-            "marks": marks,
-            "grade": grade,
-            "gpa": gpa
-            })
-        return users
+        if studentid_infile == id: 
+            grades.append({
+                    "semester": grade_sem,
+                    "course_code": course_num,
+                    "marks": marks,
+                    "grade": grade,
+                    "gpa": gpa,})
+        return grades
     
 
             
@@ -86,13 +100,13 @@ def file_path(*path_parts):
     folder_basepath = os.path.dirname(__file__)
     return os.path.join(folder_basepath,*path_parts)
 
-def export_performance_report():
+def export_performance_report(users):
     while True:
         export_or_not = input("do you want to export you performance summary file? (please answer yes or no): ").strip()
         if str(export_or_not.lower()) == "yes":
-            question_forexport()
+            question_forexport(users)
             i=0
-            while True:
+            while True: #for checking the num of file exist
                 performance_summarytxt= f"student performance summary({i}).txt"
                 fullpathtxt = file_path(performance_summarytxt)
                 if not os.path.exists(fullpathtxt):
@@ -121,30 +135,50 @@ def export_performance_report():
             clear_terminal()
     
 def question_forexport(users):
-    id = input("please enter your id (example: 12114545): ").strip()
+    while True:
+        id = input("please enter your id (example: 12114545): ").strip()
+
+        if id.lower() == "quit":
+            exit_program()
     
-    if id in users:
-        print("Please check information below:")
-        print(f"id: {id}")
-        print(f"name: {users[id]['name']}")
-        print(f"email: {users[id]['email']}")
-        print(f"semester: {users[id]['semester']}")
+        if id in users:
+            print("Please check information below:")
+            print(f"id: {id}")
+            print(f"name: {users[id]['name']}")
+            print(f"email: {users[id]['email']}")
+            print(f"current semester: {users[id]['semester']}")
 
-        semester = input("please enter semester that you want to export (example: 1, 2, 3): ")
-        if semester <= users[id]["semester"]:
-            print(f"semester {semester}")
-            loadcourse_file()
+            #ask for semester
+            while True:
+                semester = input("please enter semester that you want to export (example: 1, 2, 3...): ").strip()
+                if semester.isdigit(): #CHECKKKKK
+                    semester = int(semester)
+                    if semester <= users[id]["semester"]:
+                        print(f"semester {semester}")
+                        loadcourse_file()
+                        #print(f"id: {course[id]}")
+                        print(f"name: {users[id]['name']}")
+                        print(f"email: {users[id]['email']}")
+                        
 
-    elif id == "quit":
-        exit_program()
-    else:
-        print("ID not found.")
+                        break
+                    else:
+                        print("This student has not reached that semester yet.")
+
+                else:
+                    print("please enter semester in numbers correctly")
+                    time.sleep(1)
+                    clear_terminal()
+
+
+        else:
+            print("ID not found.")
     
 
 
 def exit_program():
     while True:
-        print(" do you want to continue? type (Yes/No)")
+        print(" do you want to continue student grading system? type (Yes/No)")
         exit_program_or_not= str(input("enter: ").strip())
         if str(exit_program_or_not.lower()) == "yes":
             print("go to main page")
