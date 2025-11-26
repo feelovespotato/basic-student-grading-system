@@ -77,9 +77,9 @@ def delete_course(course_id):
 
     for g in grades:
         parts = g.split(",")
-        if len(parts) < 2:
+        if len(parts) < 3:
             continue
-        c_id = parts[1].strip()
+        c_id = parts[2].strip()
 
         if c_id != course_id:
             new_grade_list.append(g)
@@ -153,11 +153,11 @@ def add_course():
         return
 
     coursename = input("Enter course name: ").strip()
-    new_course = f"{course_id},{coursename}"
+    semester = input("Enter semester for this course (number only): ").strip()
+
+    new_course = f"{course_id},{coursename},{semester}"
     write_file("courses.txt", [new_course])
     print("Course added successfully.")
-
-
 # Search course by id or name.
 def search_course():
     keyw = input("Enter Course ID or Name to search: ").strip().lower()

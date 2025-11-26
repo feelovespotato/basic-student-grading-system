@@ -1,11 +1,10 @@
-CSC101,Programming Fundamentals
-CSC102,Data Structures and Algorithms
-CSC103,Database Systems
-CSC104,Operating Systems
-CSC105,Computer Architecture
-CSC106,Object Oriented Programming
-CSC107,Web Development
-CSC108,Networking Fundamentals
-CSC109,Software Engineering
-CSC110,Discrete Mathematics
-
+CSC101,Programming Fundamentals,1
+CSC102,Data Structures and Algorithms,1
+CSC103,Database Systems,2
+CSC104,Operating Systems,2
+CSC105,Computer Architecture,3
+CSC106,Object Oriented Programming,3
+CSC107,Web Development,4
+CSC108,Networking Fundamentals,4
+CSC109,Software Engineering,5
+CSC110,Discrete Mathematics,5
