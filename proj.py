@@ -91,12 +91,28 @@ def delete_course(course_id):
     print("Course deleted successfully.")
 
 # Part 2 – Goyu
-# Check if student exists.
+# Check if student ID exists in students.txt
 def student_exist(stu_id):
     student = read_file("students.txt")
     for s in student:
         parts = s.split(",")
         if len(parts) > 0 and parts[0].strip() == stu_id:
+            return True
+    return False
+#Check if semester exists
+def semester_check(semester):
+    students= read_file("students.txt")
+    for s in students:
+        parts= s.split(",")
+        if len(parts) >=4 and parts[3].strip() == semester:
+            return True
+    return False
+#Check if student ID matches semester
+def student_semester(stu_id, semester):
+    students = read_file("students.txt")
+    for s in students:
+        parts = s.split(",")
+        if len(parts) >= 4 and parts[0].strip() == stu_id and parts[3].strip() == semester:
             return True
     return False
 
@@ -111,8 +127,8 @@ def course_exist(course_id):
     return False
 
 
-# Function to add student.
-def add_student():
+# Function to add student in semester.
+def add_student(selected_semester):
     stu_id = input("Input student ID to add: ").strip()
     if student_exist(stu_id):
         print("ERROR! Student already exists.")
@@ -120,102 +136,169 @@ def add_student():
 
     name = input("Enter student name: ").strip()
     email = input("Enter student email: ").strip()
-    semester = input("Enter the semester of student (number only): ").strip()
 
-    newstu = f"{stu_id},{name},{email},{semester}"
+    newstu = f"{stu_id},{name},{email},{selected_semester}"
     write_file("students.txt", [newstu])
-    print("Student added successfully.")
+    print(f"Student added successfully to semester {selected_semester}")
 
-
-# Function to delete student.
-def delete_student_menu():
-    stu_id = input("Please input student ID to be deleted: ").strip()
-    if not student_exist(stu_id):
-        print("ERROR! Student doesn't exist.")
+#delete student from selected semester
+def delete_student_in_semester(selected_semester):
+    stu_id = input("Enter Student ID to delete: ").strip()
+    if not student_semester(stu_id, selected_semester):
+        print(f"Student not found in Semester {selected_semester}")
         return
     delete_student(stu_id)
 
-
 # Function to delete course.
-def delete_course_menu():
+def delete_course_menu(selected_semester):
     course_id = input("Please input course ID to be deleted: ").strip()
-    if not course_exist(course_id):
-        print("ERROR! Course doesn't exist.")
+    courses= read_file("courses.txt")
+    updated_courses = []
+    course_found = False
+    for x in courses:
+        parts = x.split(",")
+        if len(parts) >= 3:
+            c_id = parts[0].strip()
+            c_sem = parts[2].strip()
+
+            # if course matches ID & semester → skip (delete)
+            if c_id == course_id and c_sem == selected_semester:
+                course_found = True
+                continue
+
+        updated_courses.append(x)
+
+    if not course_found:
+        print(f"ERROR! Course {course_id} not found in Semester {selected_semester}.")
         return
-    delete_course(course_id)
+    with open("courses.txt", "w") as f:
+        for item in updated_courses:
+            f.write(item + "\n")
+
+    print(f"Course {course_id} deleted successfully from Semester {selected_semester}")
 
 
-# Function to add course.
-def add_course():
+
+# Function to add course
+def add_course(selected_semester):
     course_id = input("Input new course ID: ").strip()
     if course_exist(course_id):
         print("ERROR! Course already exists.")
         return
-
-    coursename = input("Enter course name: ").strip()
-    semester = input("Enter semester for this course (number only): ").strip()
-
-    new_course = f"{course_id},{coursename},{semester}"
+    name = input("Enter course name: ").strip()
+    new_course = f"{course_id},{name},{selected_semester}"
     write_file("courses.txt", [new_course])
     print("Course added successfully.")
 # Search course by id or name.
-def search_course():
+def search_course(selected_semester):
     keyw = input("Enter Course ID or Name to search: ").strip().lower()
     courses = read_file("courses.txt")
     found = False
     for x in courses:
-        if keyw in x.lower():
-            print(x)
-            found = True
+        parts= x.split(",")
+        if len(parts) >= 3 and parts[2].strip() == selected_semester:
+            if keyw in x.lower():
+                print(x)
+                found = True
     if not found:
-        print("No matching course found in database.")
+        print(f"No matching course found in semester {selected_semester}")
 
 
 # Search student by id or name.
-def search_student():
+def search_student(selected_semester):
     keyw = input("Enter Student ID or Name to search: ").strip().lower()
     students = read_file("students.txt")
     found = False
     for c in students:
-        if keyw in c.lower():
-            print(c)
-            found = True
+        parts= c.split(",")
+        if len(parts) >= 4 and parts[3].strip() == selected_semester:
+            if keyw in c.lower():
+                print(c)
+                found = True
     if not found:
-        print("No matching student found in database.")
-
+        print(f"No matching student found in semester {selected_semester}")
+#check semester
+def select_semester():
+    while True:
+        semester= input("Please Choose a semester: ")
+        if not semester.isdigit():
+            print("Invalid! Must be a number")
+            continue
+        if not semester_check(semester):
+            print("Invalid! semester not found in database")
+            continue
+        print(f'semester {semester} selected')
+        return semester
+        
 
 # Main Menu function.
 def main():
-    print("Choose an option")
-    print("1. Add Student")
-    print("2. Delete Student")
-    print("3. Add Course")
-    print("4. Delete Course")
-    print("5. Search Student")
-    print("6. Search Course")
+    print("Welcome!")
+    while True:
+        print("Menu")       
+        print("1. Add Student")
+        print("2. Delete Student")
+        print("3. Search Student")
+        print("4. Login")
+        print("0. Exit")
+        choice = input("Choose: ")
 
-    choice_str = input("Choose 1-6: ").strip()
-    if not choice_str.isdigit():
-        print("Invalid input. Please enter a number between 1 and 6.")
-        return
+        if choice == "1":
+            sem = input("Enter current semester for new student: ")
+            add_student(sem)
 
-    choice = int(choice_str)
+        elif choice == "2":
+            sem = input("Enter the current semester of student to delete: ")
+            delete_student_in_semester(sem)
 
-    if choice == 1:
-        add_student()
-    elif choice == 2:
-        delete_student_menu()
-    elif choice == 3:
-        add_course()
-    elif choice == 4:
-        delete_course_menu()
-    elif choice == 5:
-        search_student()
-    elif choice == 6:
-        search_course()
-    else:
-        print("Invalid input. Please enter a number between 1 and 6.")
+        elif choice == "3":
+            sem = input("Enter the current semester of student to search: ")
+            search_student(sem)
 
+        elif choice == "4":
+            break
+
+        elif choice == "0":
+            print("Exiting program...")
+            return
+
+        else:
+            print("Invalid choice.")
+    #login function 
+    while True:
+        print("\n--- LOGIN ---")
+        stu_id = input("Enter your Student ID: ").strip()
+        if student_exist(stu_id):
+            print(f"Login successful! Welcome, Student {stu_id}")
+            break
+        else:
+            print("error! Student not found.")
+            print("Try again.")
+    selected_semester = select_semester()
+    while True:
+        print(f"\n--- COURSE MENU (Semester {selected_semester}) ---")
+        print("1. Add Course")
+        print("2. Delete Course")
+        print("3. Search Course")
+        print("0. Exit")
+
+        choice = input("Choose: ")
+
+        if choice == "1":
+            add_course(selected_semester)
+
+        elif choice == "2":
+            delete_course_menu(selected_semester)
+
+        elif choice == "3":
+            search_course(selected_semester)
+
+        elif choice == "0":
+            print("Exiting...")
+            return
+
+        else:
+            print("Invalid choice.")
 
 if __name__ == "__main__":
     main()
