@@ -13,9 +13,9 @@ class Course:
         self.course_name = course_name
 
 class GradeSystem:
-    def __init__(self, student_id, course, marks):
+    def __init__(self, student_id, course_id, marks):
         self.student_id = student_id
-        self.course = course
+        self.course_id= course_id
         self.marks = marks
         self.grade = self.grade_conversion_letter()     # auto conversion grade + grade point
         self.grade_point = self.grade_conversion_point(self.grade)
@@ -74,6 +74,13 @@ class GradeManager:
                     parts = [p.strip() for p in line.split('|')]    # should be changed to , (delete empty spaces)
 
                     student_id, student_name, email, current_semester = parts[:4]   # ignore var after 3rd
+
+                    student_id = str(student_id)
+                    student_name = str(student_name)
+                    email = str(email)
+                    semester = str(current_semester)
+
+
                     self.add_students(student_id, student_name, email, current_semester)
 
             print("Loaded successfully!")
@@ -108,6 +115,11 @@ class GradeManager:
                     parts = [p.strip() for p in line.split('|')]
 
                     student_id, course_id, marks = parts[:3]
+
+                    student_id = str(student_id)
+                    course_id = str(course_id)
+                    marks = float(marks)
+
                     self.add_grade(student_id, course_id, float(marks))
 
             print("Loaded successfully!")
@@ -116,28 +128,37 @@ class GradeManager:
             print("File not found!")
 
     def update_marks(self, student_id, course_id,  new_marks):
-        for grade in self.grades:
-            if grade.student_id == student_id and grade.course_id == course_id: #
-                grade.marks = new_marks
-                grade.grade = grade.grade_conversion_letter()
-                grade.grade_point = grade.grade_conversion_letter(grade.grade)
+        try:
+            new_marks = float(new_marks)
 
-                print("Marks updated successfully!")
-                return
+            for grade in self.grades:
+                if grade.student_id == student_id and grade.course_id == course_id:
+                    grade.marks = new_marks
+                    grade.grade = grade.grade_conversion_letter()
+                    grade.grade_point = grade.grade_conversion_point(grade.grade)
 
-        print("Grade record not found!")
+                    print("Marks updated successfully!")
+                    return
 
+            print("Grade record not found!")
 
-    """def delete_mark(self, student_id, mark):
-        while True:
-            try:
-                print("choose which mark to be updated")
+        except ValueError:
+            print(ValueError)
 
-            except IndexError:
-                print("No mark available!")
+    def delete_mark(self, student_id, course_id, mark):
+        try:
+            mark = float(mark)
 
-    """
+            for grade in self.grades:
+                if grade.student_id == student_id and grade.course_id == course_id and grade.marks == mark:
+                    self.grades.remove(grade)
+                    print("Mark deleted successfully!")
+                    return
 
+            print("Grade record not found!")
+
+        except ValueError:
+            print(ValueError)
 
 # main function for users
 if __name__ == "__main__":
@@ -146,9 +167,10 @@ if __name__ == "__main__":
     gm.read_students()
     gm.read_course()
     gm.read_grade()
-
     print("Files loaded successfully!")
 
+    gm.delete_mark("509-001-008", "CSC108", "64")
+    # gm.update_marks("509-001-008", "CSC108", 74)
 
 
 ## missing delete, gpa + cgpa for semesters calc, save function
