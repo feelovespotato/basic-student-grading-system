@@ -1,9 +1,0 @@
-ID: 25121211
-Name: Coshin
-Email: Coshinlee@gmail.com
-Current Semester: 3
-
-CSC105 - Computer Architecture | Grade: N/A
-CSC106 - Object Oriented Programming | Grade: N/A
-21 - CO | Grade: N/A
-30 - CC | Grade: N/A
