@@ -25,7 +25,7 @@ def clear_terminal():
 
 def loaddstudent_file():
     users = {}
-    with open("student.txt","r") as file :
+    with open(file_path("student.txt"),"r") as file :
         data = file.readlines()
     
     for i in data:
@@ -49,7 +49,7 @@ def loaddstudent_file():
 def loadcourse_file(semester):
     courses = [] # make it as a list bc one student has many subject (can store many dictionary)
 
-    with open("course.txt","r") as file:
+    with open(file_path("course.txt"),"r") as file:
         data= file.readlines()
     
     for i in data:
@@ -70,7 +70,7 @@ def loadcourse_file(semester):
 def loadgrade_file(id):
     grades= []
 
-    with open("grade.txt","r") as file :
+    with open(file_path("grade.txt"),"r") as file :
         data = file.readlines()
     
     for i in data:
@@ -80,17 +80,18 @@ def loadgrade_file(id):
         grade_sem = int(spliting[1])
         course_num= spliting[2]
         marks = spliting[3]
-        grade = spliting[4]
-        gpa = spliting [5]
-            #get student id from part 2 
+        #grade = spliting[4]
+        #gpa = spliting [5]
+
+        #get student id from part 2 
         if studentid_infile == id: 
             grades.append({
                     "semester": grade_sem,
                     "course_code": course_num,
                     "marks": marks,
-                    "grade": grade,
-                    "gpa": gpa,})
-        return grades
+                    #"grade": grade,#"gpa": gpa,
+                    })
+    return grades
     
 
             
@@ -104,12 +105,30 @@ def export_performance_report(id,semester,users):
     student= users[id]
     courses = loadcourse_file(semester)
     grades = loadgrade_file(id)
-    semester_grades = [g for g in grades if g["semester"] == semester]
+    #loop through every single grade fro that particular sem
+    semester_grades = [g for g in grades 
+                       if g["semester"] == semester]
+    for course in courses:
+    # find matching grade record for this course
+        grade_record = next(
+            (g for g in semester_grades if g["course_code"] == course["course_code"]),
+            None
+        )
+
+        # if found → show marks, else show N/A
+        if grade_record:
+            marks_str = grade_record["marks"]
+        else:
+            marks_str = "N/A"
+
+        print(f"{course['course_code']} - {course['course_name']} | Marks: {marks_str}")
+
 
     while True:
         export_or_not = input("do you want to export you performance summary file? (please answer yes or no): ").strip()
         if str(export_or_not.lower()) == "yes":
-            question_forexport(id)
+            question_forexport()
+            #for different name file 1,2,3,4...
             i=0
             while True: #for checking the num of file exist
                 performance_summarytxt= f"student performance summary({i}).txt"
@@ -139,33 +158,40 @@ def export_performance_report(id,semester,users):
             time.sleep(1)
             clear_terminal()
     
-def question_forexport(id):
+def question_forexport():
+    student = loaddstudent_file()
+
     while True:
         inputid = input("please enter your id (example: 12114545): ").strip()
 
-        if id.lower() == "quit":
+        if inputid.lower() == "quit":
             exit_program()
+            break
     
-        if inputid in id:
+        if inputid in student:
             print("Please check information below:")
-            print(f"id: {inputid}")
-            print(f"name: {id[inputid]['name']}")
-            print(f"email: {id[inputid]['email']}")
-            print(f"current semester: {id[inputid]['semester']}")
+            print(f"ID: {inputid}")
+            print(f"name: {student[inputid]['name']}")
+            print(f"email: {student[inputid]['email']}")
+            print(f"current semester: {student[inputid]['semester']}")
 
             #ask for semester
             while True:
                 semester = input("please enter semester that you want to export (example: 1, 2, 3...): ").strip()
                 if semester.isdigit(): #CHECKKKKK
                     semester = int(semester)
-                    if semester <= id[inputid]["semester"]:
+                    if semester <= student[inputid]["semester"]:
+                        course=loadcourse_file(semester)
+                        grades = loadgrade_file(inputid)
                         print(f"semester {semester}")
-                        loadcourse_file()
                         #print(f"id: {course[id]}")
                         print(f"name: {id[inputid]['name']}")
                         print(f"email: {id[inputid]['email']}")
-                        
 
+                        for c in course :
+                            grade_record = next((g for g in grades if g["course_code"] == c["course_code"] and g["semester"] == semester), None)
+                            grade_str = grade_record["marks"] if grade_record else "N/A"
+                            print(f"{c['course_code']} - {c['course_name']} | Grade: {grade_str}")
                         break
                     else:
                         print("This student has not reached that semester yet.")
@@ -198,7 +224,7 @@ def exit_program():
             print(" please answer yes/no ")
             time.sleep(1)
             clear_terminal()
-export_performance_report()
+export_performance_report(id,semester,users)
 exit_program()
 
 

@@ -8,3 +8,6 @@ CSC107,Web Development,4
 CSC108,Networking Fundamentals,4
 CSC109,Software Engineering,5
 CSC110,Discrete Mathematics,5
+
+21,CO,3
+30,CC,3
