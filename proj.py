@@ -207,16 +207,22 @@ def search_course(selected_semester):
 # Search student by id or name.
 def search_student(selected_semester):
     keyw = input("Enter Student ID or Name to search: ").strip().lower()
-    students = read_file("students.txt")
-    found = False
+    students = read_file("basic-student-grading-system/students.txt")
+    
     for c in students:
         parts= c.split(",")
         if len(parts) >= 4 and parts[3].strip() == selected_semester:
             if keyw in c.lower():
-                print(c)
-                found = True
-    if not found:
-        print(f"No matching student found in semester {selected_semester}")
+                print(
+                    f"\nStudent found."
+                    f"\nID: {parts[0]}"
+                    f"\nName: {parts[1]}"
+                    f"\nEmail: {parts[2]}"
+                    f"\nSemester: {parts[3]}"
+                )
+                return parts[0] 
+    print(f"No matching student found in semester {selected_semester}")
+    return None
 #check semester
 def select_semester():
     while True:
@@ -230,7 +236,80 @@ def select_semester():
         print(f'semester {semester} selected')
         return semester
         
+#part 4 - darvesh
+def display_individual_performance(selected_semester):
+    id_stu = search_student(selected_semester)
+    
+    if id_stu is None:
+        print("Cannot display performance. Student not found.")
+        return
+    
+    # read the file
+    with open("basic-student-grading-system/grades.txt", "r") as f:
+        lines = f.readlines()
+    
+    #find student in grades.txt
+    from grade_calc import GradeSystem
+    
+    for line in lines:
+        parts = [p.strip() for p in line.split(",")]
+        if parts[0] == id_stu: # match student id
+            marks = float(parts[3])   
+            grade_obj = GradeSystem(parts[0], parts[2], marks)
+            print(
+                f"\n\nStudent Data:"
+                f"\nID: {parts[0]}"
+                f"\nSem: {parts[1]}"
+                f"\nCourse: {parts[2]}"
+                f"\nMark: {parts[3]}"
+                f"\nGrade: {grade_obj.grade}"
+                f"\nGrade Point: {grade_obj.grade_point}"
+               
 
+
+            )
+            return
+
+    
+    print("Student ID not found in file.")
+
+def course_performance_summary(course_id):
+    print(f"\nCOURSE PERFORMANCE FOR {course_id}")
+
+    # read the file
+    with open("basic-student-grading-system/grades.txt", "r") as f:
+        lines = f.readlines()     
+
+    marks = []
+    for line in lines:
+        parts = [p.strip() for p in line.split(",")]
+        if len(parts) < 4:
+            continue
+
+        if parts[2]  == course_id:
+            mark = float(parts[3])  
+            marks.append(mark)  
+    if not marks:
+        print("No grades found for this course.")
+        return
+    
+    from grade_calc import GradeSystem
+
+
+    # Calculate stats
+    avg_mark = sum(marks) / len(marks)
+    highest = max(marks)
+    lowest = min(marks)
+    
+    print(f"Students Enrolled: {len(marks)}")
+    print(f"Average Mark: {avg_mark:.2f}")
+    print(f"Highest Mark: {highest}")
+    print(f"Lowest Mark: {lowest}")
+
+    grade_obj = GradeSystem(None, None,  avg_mark)
+    print(f"Overall letter grade: {grade_obj.grade}")                                                                                 
+    
+    
 # Main Menu function.
 def main():
     print("Welcome!")
@@ -239,7 +318,8 @@ def main():
         print("1. Add Student")
         print("2. Delete Student")
         print("3. Search Student")
-        print("4. Login")
+        print("4. Analise Course")
+        print("5. Login")
         print("0. Exit")
         choice = input("Choose: ")
 
@@ -253,9 +333,13 @@ def main():
 
         elif choice == "3":
             sem = input("Enter the current semester of student to search: ")
-            search_student(sem)
-
+            display_individual_performance(sem)
+        
         elif choice == "4":
+            cou = input("Enter the course you want to analise: ").upper()
+            course_performance_summary(cou)
+        
+        elif choice == "5":
             break
 
         elif choice == "0":
