@@ -8,9 +8,10 @@ class Student:
         self.semester = semester
 
 class Course:
-    def __init__(self, course_id, course_name):
+    def __init__(self, course_id, course_name, semester):
         self.course_id = course_id
         self.course_name = course_name
+        self.semester = semester
 
 class GradeSystem:
     def __init__(self, student_id, course_id, marks):
@@ -63,25 +64,15 @@ class GradeManager:
         grade = GradeSystem(student_id, course_id, marks)
         self.grades.append(grade)
 
-    def read_students(self, filename ="students.txt"):  # txt format A | B | C
+    def read_students(self, filename ="students.txt"):  # txt format A,B,C
         try:
             with open(filename, "r") as file:
                 for line in file:
-                    line = line.strip()
-                    if not line:
-                        continue
 
-                    parts = [p.strip() for p in line.split('|')]    # should be changed to , (delete empty spaces)
+                    parts = [p.strip() for p in line.split(',')]
+                    student_id, student_name, email, semester = parts[:4]   # ignore var after 4th
 
-                    student_id, student_name, email, current_semester = parts[:4]   # ignore var after 3rd
-
-                    student_id = str(student_id)
-                    student_name = str(student_name)
-                    email = str(email)
-                    semester = str(current_semester)
-
-
-                    self.add_students(student_id, student_name, email, current_semester)
+                    self.add_students(student_id, student_name, email, semester)
 
             print("Loaded successfully!")
 
@@ -92,14 +83,11 @@ class GradeManager:
         try:
             with open(filename, "r") as file:
                 for line in file:
-                    line = line.strip()
-                    if not line:
-                        continue
 
-                    parts = [p.strip() for p in line.split('|')]
+                    parts = [p.strip() for p in line.split(',')]
+                    course_id, course_name, semester = parts[:3]
 
-                    course_id, course_name = parts[:2]
-                    self.add_course(course_id, course_name)
+                    self.add_course(course_id, course_name, semester)
 
         except FileNotFoundError:
             print("File not found!")
@@ -112,15 +100,16 @@ class GradeManager:
                     if not line:            ## skip if empty line
                         continue
 
-                    parts = [p.strip() for p in line.split('|')]
+                    parts = [p.strip() for p in line.split(',')]
 
-                    student_id, course_id, marks = parts[:3]
+                    student_id, semester, course_id, marks = parts[:4]
 
                     student_id = str(student_id)
+                    semester = str(semester)
                     course_id = str(course_id)
                     marks = float(marks)
 
-                    self.add_grade(student_id, course_id, float(marks))
+                    self.add_grade(student_id, semester, course_id, marks)
 
             print("Loaded successfully!")
 
