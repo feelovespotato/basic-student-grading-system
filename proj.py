@@ -264,6 +264,8 @@ def display_individual_performance(selected_semester):
                 f"\nMark: {parts[3]}"
                 f"\nGrade: {grade_obj.grade}"
                 f"\nGrade Point: {grade_obj.grade_point}"
+                f"\nCGPA: "
+                
                
 
 
