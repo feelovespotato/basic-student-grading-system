@@ -1,16 +1,22 @@
 import os
+import sys
+
+from proj import student_semester
 
 
 def load_data():
     grade_record = []
 
     try:
-        with open("grades.txt", "r") as file:
+        with open("grades2.txt", "r") as file:
             for line in file:
 
                 parts = [p.strip() for p in line.split(',')]
                 student_id, semester, course_id, marks = parts[:4]
 
+                student_id = int(student_id)
+                semester = int(semester)
+                course_id = str(course_id)
                 marks = float(marks)
 
                 grade_record.append({"student_id": student_id, "semester": semester, "course_id": course_id, "marks": marks})
@@ -85,7 +91,7 @@ def calc_gpa(records, student_id, semester):
     points_list = []
 
     for r in selected_list:
-        letter = grade_conversion_point(r["marks"])
+        letter = grade_conversion_letter(r["marks"])
         points = grade_conversion_point(letter)
         points_list.append(points)
 
@@ -94,5 +100,97 @@ def calc_gpa(records, student_id, semester):
     return round(gpa, 2)
 
 def calc_cgpa(records, student_id, semester):
-    all_list = []
+    semester_gpa = {}
 
+    # find every sem (current + past) for each student
+    student_semesters = []
+    for r in records:
+        if r["student_id"] == student_id:
+            if r["semester"] not in student_semesters:    # prevent duplicate, add when not in list
+                student_semesters.append(r["semester"])
+
+    student_semesters.sort()
+
+    for s in student_semesters:
+        courses_in_sem = [] # for every courses this student have in this sem
+        for r in records:
+            if r["student_id"] == student_id and r["semester"] == semester:
+                courses_in_sem.append(r)
+
+        total_points = 0
+        for course in courses_in_sem:
+            marks = course["marks"]
+            letter_grade = grade_conversion_letter(marks)
+            points_grade = grade_conversion_point(letter_grade)
+            total_points += points_grade
+
+        number_of_courses = len(courses_in_sem)
+        if number_of_courses > 0:
+            gpa = total_points / number_of_courses
+        else:
+            gpa = 0
+
+        semester_gpa[s] = round(gpa, 2)
+    return semester_gpa
+
+def calc_cgpa(records, student_id):
+    # need to find all courses this student have (current +past)
+    student_courses = []
+    for r in records:
+        if r["student_id"] == student_id:
+            student_courses.append(r)
+
+    total_points = 0
+    for course in student_courses:
+        marks = course["marks"]
+        letter_grade = grade_conversion_letter(marks)
+        points_grade = grade_conversion_point(letter_grade)
+        total_points += points_grade
+
+    number_of_courses = len(student_courses)
+    if number_of_courses > 0:
+        cgpa = total_points / number_of_courses
+    else:
+        cgpa = 0
+
+    return round(cgpa, 2)
+
+def display_performance(records): # highest, lowest, average marks
+    course_marks = {}
+    for r in records:
+        course_id = r["course_id"]
+        marks = r["marks"]
+
+        if course_id not in course_marks:
+            course_marks[course_id] = []
+
+        course_marks[course_id].append(marks)
+
+    for course_id, marks_list in course_marks.items():
+        marks_max = max(marks_list)
+        marks_min = min(marks_list)
+
+        total_marks = sum(marks_list)
+        average_marks = round(total_marks / len(marks_list),2)
+
+        print(f"Course: {course_id}: Highest = {marks_max}, Lowest = {marks_min}, Average = {average_marks}")
+
+def main():
+    records = load_data()
+    print("Menu")
+
+
+
+
+if __name__ == "__main__":
+    records = load_data()
+
+    student_id = 509010
+    semester = 1
+    course_id = "CSC101"
+    marks = 10
+
+
+display_performance(records)
+print(calc_gpa(records, student_id, semester))
+print(calc_cgpa(records, student_id))
