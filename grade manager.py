@@ -1,9 +1,6 @@
 import os
 import sys
 
-from proj import student_semester
-
-
 def load_data():
     grade_record = []
 
@@ -61,7 +58,7 @@ def add_grade(records, student_id, semester, course_id, marks):
     records.append({"student_id": student_id, "semester": semester, "course_id": course_id, "marks": marks})
     save_data(records)
 
-def update_grade(records, student_id, semester, course_id, marks):
+def update_grade(records, student_id, course_id, marks):
     for r in records:
         if r["student_id"] == student_id and r["course_id"] == course_id:
             r["marks"] = marks
@@ -70,7 +67,7 @@ def update_grade(records, student_id, semester, course_id, marks):
 
     return False
 
-def delete_grade(records, student_id, semester, course_id, marks):
+def delete_grade(records, student_id, course_id):
     for r in records:
         if r["student_id"] == student_id and r["course_id"] == course_id:
             records.remove(r)
@@ -80,26 +77,6 @@ def delete_grade(records, student_id, semester, course_id, marks):
     return False
 
 def calc_gpa(records, student_id, semester):
-    selected_list = []
-    for r in records:
-        if r["student_id"] == student_id and r["semester"] == semester:
-            selected_list.append(r)
-
-    if not selected_list:
-        return None
-
-    points_list = []
-
-    for r in selected_list:
-        letter = grade_conversion_letter(r["marks"])
-        points = grade_conversion_point(letter)
-        points_list.append(points)
-
-    total_points = sum(points_list)
-    gpa = total_points / len(points_list)
-    return round(gpa, 2)
-
-def calc_cgpa(records, student_id, semester):
     semester_gpa = {}
 
     # find every sem (current + past) for each student
@@ -114,7 +91,7 @@ def calc_cgpa(records, student_id, semester):
     for s in student_semesters:
         courses_in_sem = [] # for every courses this student have in this sem
         for r in records:
-            if r["student_id"] == student_id and r["semester"] == semester:
+            if r["student_id"] == student_id and r["semester"] == s:
                 courses_in_sem.append(r)
 
         total_points = 0
