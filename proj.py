@@ -191,7 +191,7 @@ def add_course(stu_id,selected_semester):
     while True:
         mark=input(f"Enter student {stu_id} mark on this course (0-100): ").strip()
         try:
-            mark_value = float(mark)
+            mark_value = int(mark)
             if 0 <= mark_value <= 100:
                 mark= str(mark_value)
                 break
