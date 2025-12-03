@@ -213,7 +213,7 @@ def search_student(selected_semester):
     
     for c in students:
         parts= c.split(",")
-        if len(parts) >= 4 and parts[3].strip() == selected_semester:
+        if len(parts) >= 4 and int(parts[3].strip()) == selected_semester:
             if keyw in c.lower():
                 print(
                     f"\nStudent found."
@@ -255,60 +255,79 @@ def display_individual_performance(selected_semester):
         print("Cannot display performance. Student not found.")
         return
     
-    # read the file
-    with open(file_path("grades.txt"), "r") as f:
+    # read grades2.txt
+    with open(("basic-student-grading-system/grades2.txt"), "r") as f:
         lines = f.readlines()
-    
-    #find student in grades.txt
-    from grade_calc import GradeSystem
-    
+
+    student_record = []
+
+    # Collect all grade lines for this student
     for line in lines:
         parts = [p.strip() for p in line.split(",")]
-        if parts[0] == stu_id: # match student id
-            marks = float(parts[3])   
-            grade_obj = GradeSystem(parts[0], parts[2], marks)
-            print(
-                f"\n\nStudent Data:"
-                f"\nID: {parts[0]}"
-                f"\nSem: {parts[1]}"
-                f"\nCourse: {parts[2]}"
-                f"\nMark: {parts[3]}"
-                f"\nGrade: {grade_obj.grade}"
-                f"\nGrade Point: {grade_obj.grade_point}"
-                f"\nCGPA: "
-                
-               
+        
+        # parts = [ID, semester, code, mark]
+        if parts[0] == stu_id:
+            student_record.append(parts)
+
+    if not student_record:
+        print("No grades found for this student.")
+        return
 
 
-            )
-            return
+    print("\n--- Academic Performance (Sem 1 to Sem", selected_semester - 1, ") ---")
 
-    
-    print("Student ID not found in file.")
+    found_any = False
 
-def course_performance_summary(course_id):
-    print(f"\nCOURSE PERFORMANCE FOR {course_id}")
+    for record in student_record:
+        sem = int(record[1])      # semester
+        course = record[2]        # CSC101
+        score = float(record[3])  # marks
+
+        if sem < selected_semester:       # <-- sem 1 to n-1
+            found_any = True
+            print(f"Semester {sem} | Course: {course} | Score: {score}")
+
+    if not found_any:
+        print("Results N/A.")
+
+
+def course_performance_summary(course_id, selected_semester):
+    course_id = course_id.upper()
+    print(f"\n---COURSE PERFORMANCE FOR {course_id}---")
 
     # read the file
-    with open(file_path("grades.txt"), "r") as f:
+    with open(file_path("grades2.txt"), "r") as f:
         lines = f.readlines()     
 
+    #gather marks
     marks = []
+    course_found = False
+
     for line in lines:
         parts = [p.strip() for p in line.split(",")]
-        if len(parts) < 4:
+        if len(parts) != 4:
             continue
+  
 
-        if parts[2]  == course_id:
-            mark = float(parts[3])  
-            marks.append(mark)  
+        sem = int(parts[1])
+        course = parts[2]
+        score = float(parts[3])
+    
+        if course == course_id and sem == selected_semester:
+            course_found = True
+            marks.append(score)
+
+    if not course_found:
+        print("Course not found in your semester.")
+        return
     if not marks:
         print("No grades found for this course.")
         return
     
-    from grade_calc import GradeSystem
+    
 
-
+    
+    
     # Calculate stats
     avg_mark = sum(marks) / len(marks)
     highest = max(marks)
@@ -319,6 +338,7 @@ def course_performance_summary(course_id):
     print(f"Highest Mark: {highest}")
     print(f"Lowest Mark: {lowest}")
 
+    from grade_calc import GradeSystem
     grade_obj = GradeSystem(None, None,  avg_mark)
     print(f"Overall letter grade: {grade_obj.grade}")                                                                                 
     
@@ -543,9 +563,8 @@ def main():
             delete_student_in_semester(sem)
 
         elif choice == "3"or choice=="search student":
-            sem = input("Enter the current semester of student to search: ")
             while True:
-                sem = input("Enter the current semester of student to delete: ")
+                sem = input("Enter the current semester of student to search: ")
                 if len(sem) != 1:
                     print("Input has to be a single digit")
                     continue
@@ -589,7 +608,7 @@ def main():
         print(f"\n--- COURSE MENU (Semester {selected_semester}) ---")
         print("1. Add Course")
         print("2. Delete Course")
-        print("3. Anaylize Course")
+        print("3. Analyze Course")
         print("4. Search Course")
         print(f"5. export semester report from Semester 1 to {selected_semester}")
         print("0. Exit")
@@ -604,7 +623,7 @@ def main():
 
         elif choice == "3" or choice == "analyze":
             cou = input("Enter the course you want to analyze: ").upper()
-            course_performance_summary(cou)
+            course_performance_summary(cou, selected_semester)
 
         elif choice == "4" or choice == "search course":
             search_course(selected_semester)
