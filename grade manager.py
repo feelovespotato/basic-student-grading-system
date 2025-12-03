@@ -79,6 +79,7 @@ def delete_grade(records, student_id, course_id):
             return True
 
     return False
+#---------------------------------------------------------------------------------------------------------------- FOR COSHIN
 
 def calc_gpa(records, student_id, semester):
     semester_gpa = {}
@@ -113,7 +114,7 @@ def calc_gpa(records, student_id, semester):
 
         semester_gpa[s] = round(gpa, 2)
     return semester_gpa
-
+#---------------------------------------------------------------------------------------------------------------- FOR COSHIN
 def calc_cgpa(records, student_id):
     # need to find all courses this student have (current +past)
     student_courses = []
@@ -146,7 +147,7 @@ def display_performance(records): # highest, lowest, average marks
             course_marks[course_id] = []
 
         course_marks[course_id].append(marks)
-        #tuple sort out the data 
+        #tuple sort out the data
     for course_id, marks_list in course_marks.items():
         marks_max = max(marks_list)
         marks_min = min(marks_list)
