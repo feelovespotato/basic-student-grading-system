@@ -188,7 +188,21 @@ def add_course(stu_id,selected_semester):
         print("ERROR! Course already exists.")
         return
     name = input("Enter course name: ").strip()
+    while True:
+        mark=input(f"Enter student {stu_id} mark on this course (0-100): ").strip()
+        try:
+            mark_value = float(mark)
+            if 0 <= mark_value <= 100:
+                mark= str(mark_value)
+                break
+            else:
+                print("Invalid mark, have to be 0-100")
+        except ValueError:
+            print("Invalid input! must be number")
+
     new_course = f"{stu_id},{course_id},{name},{selected_semester}"
+    new_marks= f"{stu_id},{selected_semester},{course_id},{mark}"
+    write_file(file_path("grades.txt"), [new_marks])
     write_file(file_path("courses.txt"), [new_course])
     print("Course added successfully.")
 # Search course by id or name.
