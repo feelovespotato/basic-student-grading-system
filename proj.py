@@ -188,7 +188,21 @@ def add_course(stu_id,selected_semester):
         print("ERROR! Course already exists.")
         return
     name = input("Enter course name: ").strip()
+    while True:
+        mark=input(f"Enter student {stu_id} mark on this course (0-100): ").strip()
+        try:
+            mark_value = float(mark)
+            if 0 <= mark_value <= 100:
+                mark= str(mark_value)
+                break
+            else:
+                print("Invalid mark, have to be 0-100")
+        except ValueError:
+            print("Invalid input! must be number")
+
     new_course = f"{stu_id},{course_id},{name},{selected_semester}"
+    new_marks= f"{stu_id},{selected_semester},{course_id},{mark}"
+    write_file(file_path("grades.txt"), [new_marks])
     write_file(file_path("courses.txt"), [new_course])
     print("Course added successfully.")
 # Search course by id or name.
@@ -213,7 +227,7 @@ def search_student(selected_semester):
     
     for c in students:
         parts= c.split(",")
-        if len(parts) >= 4 and parts[3].strip() == selected_semester:
+        if len(parts) >= 4 and int(parts[3].strip()) == selected_semester:
             if keyw in c.lower():
                 print(
                     f"\nStudent found."
@@ -543,9 +557,8 @@ def main():
             delete_student_in_semester(sem)
 
         elif choice == "3"or choice=="search student":
-            sem = input("Enter the current semester of student to search: ")
             while True:
-                sem = input("Enter the current semester of student to delete: ")
+                sem = input("Enter the current semester of student to search: ")
                 if len(sem) != 1:
                     print("Input has to be a single digit")
                     continue
