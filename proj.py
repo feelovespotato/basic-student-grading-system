@@ -107,14 +107,6 @@ def student_exist(stu_id):
         if len(parts) > 0 and parts[0].strip() == stu_id:
             return True
     return False
-#Check if semester exists
-def semester_check(semester):
-    students= read_file(file_path("students.txt"))
-    for s in students:
-        parts= s.split(",")
-        if len(parts) >=4 and parts[3].strip() == semester:
-            return True
-    return False
 #Check if student ID matches semester
 def student_semester(stu_id, semester):
     students = read_file(file_path("students.txt"))
@@ -233,19 +225,28 @@ def search_student(selected_semester):
                 return parts[0] 
     print(f"No matching student found in semester {selected_semester}")
     return None
+#get current semester
+def get_current_sem(stu_id):
+    students=read_file(file_path("students.txt"))
+    for s in students:
+        parts=s.split(",")
+        if parts[0].strip()== stu_id:
+            return int(parts[3])
+    return 1
 #check semester
-def select_semester():
+def select_semester(current_semester):
     while True:      
-        semester= input("Please Choose a semester: ")
+        semester= input(f"Please choose a semester (1 to {current_semester}): ")
         if not semester.isdigit():
             print("Invalid! Must be a number")
             continue
-        if not semester_check(semester):
-            print("Invalid! semester not found in database")
+        semester= int(semester)
+        if semester < 1 or semester > current_semester:
+            print(f"Invalid, must be between 1 and {current_semester}.")
             continue
-        print(f'semester {semester} selected')
+        print(f"Semester {semester} selected")
         return semester
-        
+    
 #part 4 - darvesh
 def display_individual_performance(selected_semester):
     id_stu = search_student(selected_semester)
@@ -561,14 +562,14 @@ def main():
             print("Try again.")
             time.sleep(1)
             clear_terminal()
-
-    selected_semester = select_semester()
+    current_sem= get_current_sem(stu_id)
+    selected_semester = select_semester(current_sem)
     while True:
         print(f"\n--- COURSE MENU (Semester {selected_semester}) ---")
         print("1. Add Course")
         print("2. Delete Course")
         print("3. Search Course")
-        print("4. export current semester report")
+        print(f"4. export  semester report from Semester 1 to {current_sem}")
         print("0. Exit")
 
         choice = input("Choose: ").strip().lower()
