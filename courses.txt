@@ -1,15 +1,7 @@
-CSC101,Programming Fundamentals,1
-CSC102,Data Structures and Algorithms,1
-CSC103,Database Systems,2
-CSC104,Operating Systems,2
-CSC105,Computer Architecture,3
-CSC106,Object Oriented Programming,3
-CSC107,Web Development,4
-CSC108,Networking Fundamentals,4
-CSC109,Software Engineering,5
-CSC110,Discrete Mathematics,5
+25121211,CSC102,CO,3
 
-21,CO,3
-30,CC,3
-CSC1034,OC,2
-EC,KO,2
+25121211,COS12,DE,3
+25121211,BI12,BI,2
+25121211,AI,JI,2
+1212,haha1,cb,3
+1212,fifi23,fit,3

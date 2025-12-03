@@ -1,9 +1,0 @@
-ID: 25121211
-Name: Coshin
-Email: Coshinlee@gmail.com
-Current Semester: 3
-
-CSC103 - Database Systems | Grade: N/A
-CSC104 - Operating Systems | Grade: N/A
-CSC1034 - OC | Grade: N/A
-EC - KO | Grade: N/A

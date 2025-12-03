@@ -1,11 +1,15 @@
 import os
 import sys
 
+def file_path(*path_parts):
+    folder_basepath = os.path.dirname(__file__)
+    return os.path.join(folder_basepath,*path_parts)
+
 def load_data():
     grade_record = []
 
     try:
-        with open("grades2.txt", "r") as file:
+        with open(file_path("grades2.txt"), "r") as file:
             for line in file:
 
                 parts = [p.strip() for p in line.split(',')]
@@ -26,7 +30,7 @@ def load_data():
         return []
 
 def save_data(records):
-    with open("grades.txt", "w") as file:
+    with open(file_path("grades.txt"), "w") as file:
         for r in records:
             file.write(f"{r["student_id"]},{r["semester"]},{r["course_id"]},{r["marks"]}\n")
             print("Data saved!")
@@ -85,7 +89,7 @@ def calc_gpa(records, student_id, semester):
         if r["student_id"] == student_id:
             if r["semester"] not in student_semesters:    # prevent duplicate, add when not in list
                 student_semesters.append(r["semester"])
-
+    
     student_semesters.sort()
 
     for s in student_semesters:
@@ -142,7 +146,7 @@ def display_performance(records): # highest, lowest, average marks
             course_marks[course_id] = []
 
         course_marks[course_id].append(marks)
-
+        #tuple sort out the data 
     for course_id, marks_list in course_marks.items():
         marks_max = max(marks_list)
         marks_min = min(marks_list)

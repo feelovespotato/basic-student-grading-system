@@ -117,11 +117,11 @@ def student_semester(stu_id, semester):
 
 
 # Check if course exists.
-def course_exist(course_id):
+def course_exist(stu_id,course_id):
     course = read_file(file_path("courses.txt"))
     for c in course:
         parts = c.split(",")
-        if len(parts) > 0 and parts[0].strip() == course_id:
+        if len(parts) >= 4 and parts[1].strip() == course_id and parts[0].strip()== stu_id:
             return True
     return False
 
@@ -182,13 +182,13 @@ def delete_course_menu(selected_semester):
 
 
 # Function to add course
-def add_course(selected_semester):
+def add_course(stu_id,selected_semester):
     course_id = input("Input new course ID: ").strip()
-    if course_exist(course_id):
+    if course_exist(stu_id,course_id):
         print("ERROR! Course already exists.")
         return
     name = input("Enter course name: ").strip()
-    new_course = f"{course_id},{name},{selected_semester}"
+    new_course = f"{stu_id},{course_id},{name},{selected_semester}"
     write_file(file_path("courses.txt"), [new_course])
     print("Course added successfully.")
 # Search course by id or name.
@@ -379,7 +379,7 @@ def loaddstudent_file():
         }
     return users
 
-def loadcourse_file(stu_id,semester):
+def loadcourse_file(stu_id,current_semester):
     courses = [] # make it as a list bc one student has many subject (can store many dictionary)
 
     with open(file_path("courses.txt"),"r") as file:
@@ -395,11 +395,11 @@ def loadcourse_file(stu_id,semester):
             continue
 
         student_infile = spliting[0]
-        course_num= spliting[0]
-        course_name = spliting[1]
-        sem = int(spliting[2])
+        course_num= spliting[1]
+        course_name = spliting[2]
+        sem = int(spliting[3])
 
-        if student_infile == stu_id and sem == semester : # filterrrr
+        if student_infile == stu_id and sem == current_semester : # filterrrr
             courses.append({ 
                 "course_code": course_num,
                 "course_name": course_name})
@@ -449,7 +449,7 @@ def file_path(*path_parts):
 def export_performance_report(stu_id,semester,users):
     student= users[stu_id]
     current_semester = semester #pass selexted semester into variable
-    courses = loadcourse_file(current_semester)
+    courses = loadcourse_file(stu_id,current_semester)
     grades = loadgrade_file(stu_id)
     #loop through every single grade for that particular sem only regardless which student
     semester_grades = [g for g in grades 
@@ -484,6 +484,7 @@ def export_performance_report(stu_id,semester,users):
 
             print("exported file, you can check your file in ")
             print(fullpathtxt)
+            exit_program()
 
         elif str(export_or_not.lower()) == "no":
             print("returning to main page...")
@@ -584,7 +585,7 @@ def main():
         choice = input("Choose: ").strip().lower()
 
         if choice == "1" or choice == "add course":
-            add_course(selected_semester)
+            add_course(stu_id,selected_semester)
 
         elif choice == "2" or choice == "delete course":
             delete_course_menu(selected_semester)
