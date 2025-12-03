@@ -112,7 +112,9 @@ def export_performance_report(stu_id,semester,users):
     courses = loadcourse_file(current_semester)
     grades = loadgrade_file(stu_id)
     #loop through every single grade for that particular sem
-    semester_grades = [g for g in grades if g["semester"] == current_semester]
+    semester_grades = [
+        g for g in grades 
+        if g["semester"] == current_semester]
 
     for c in courses:
     # find matching grade record for this course

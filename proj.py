@@ -23,7 +23,6 @@ def read_file(file_name):
     try:
         with open(file_name, "r") as f:
             lines = [line.strip() for line in f.readlines()]
-        print(f"Data read from {file_name}")
         return lines
     except FileNotFoundError:
         print(f"Warning: {file_name} not found! Returning empty list.")
@@ -130,6 +129,7 @@ def course_exist(course_id):
 # Function to add student in semester.
 def add_student(selected_semester):
     stu_id = input("Input student ID to add: ").strip()
+    
     if student_exist(stu_id):
         print("ERROR! Student already exists.")
         return
@@ -333,6 +333,7 @@ def exit_program():
         print(" do you want to continue student grading system? type (Yes/No)")
         exit_program_or_not= str(input("enter: ").strip().lower())
         if str(exit_program_or_not.lower()) == "yes":
+            clear_terminal()
             main()
         elif str(exit_program_or_not.lower())== "no":
             clear_terminal()
@@ -361,7 +362,13 @@ def loaddstudent_file():
         studentid_infile = spliting[0]
         name= spliting[1]
         email = spliting[2]
-        semester = int(spliting[3])
+
+        #there is error in the file so i check it before executing
+        try:
+            semester = int(spliting[3])
+        except ValueError:
+            print(f"Skipping invalid line in students.txt: {spliting}")
+            continue 
         
         users[studentid_infile ] = {
             "name": name,
@@ -372,7 +379,7 @@ def loaddstudent_file():
         }
     return users
 
-def loadcourse_file(semester):
+def loadcourse_file(stu_id,semester):
     courses = [] # make it as a list bc one student has many subject (can store many dictionary)
 
     with open(file_path("courses.txt"),"r") as file:
@@ -383,12 +390,16 @@ def loadcourse_file(semester):
         if not i:
             continue  # skip empty lines
         spliting = i.split(',')
+        #skip broken lines
+        if len(spliting)<4 :
+            continue
 
+        student_infile = spliting[0]
         course_num= spliting[0]
         course_name = spliting[1]
         sem = int(spliting[2])
 
-        if sem == semester : # filterrrr
+        if student_infile == stu_id and sem == semester : # filterrrr
             courses.append({ 
                 "course_code": course_num,
                 "course_name": course_name})
@@ -407,7 +418,15 @@ def loadgrade_file(stu_id):
             continue  # skip empty lines
         spliting = i.split(',')
         studentid_infile = spliting[0]
-        grade_sem = int(spliting[1])
+
+        #error here
+        if spliting[0] != stu_id:
+                continue  # skip other students
+        try:
+            grade_sem = int(spliting[1])
+        except ValueError:
+            print(f"Skipping invalid grade line: {spliting}")
+            continue
         course_num= spliting[2]
         marks = spliting[3]
         #grade = spliting[4]
@@ -429,52 +448,42 @@ def file_path(*path_parts):
 
 def export_performance_report(stu_id,semester,users):
     student= users[stu_id]
-    current_semester = student['semester']
+    current_semester = semester #pass selexted semester into variable
     courses = loadcourse_file(current_semester)
     grades = loadgrade_file(stu_id)
-    #loop through every single grade for that particular sem
-    semester_grades = [g for g in grades if g["semester"] == current_semester]
-
-    for c in courses:
-    # find matching grade record for this course
-        grade_record = next(
-        (g for g in semester_grades if g["course_code"] == c["course_code"]),
-        None
-        )
-        marks_str = grade_record["marks"] if grade_record else "N/A"
+    #loop through every single grade for that particular sem only regardless which student
+    semester_grades = [g for g in grades 
+                       if g["semester"] == current_semester]
 
     while True:
-        export_or_not = input("do you want to export you performance summary file? (please answer yes or no): ").strip()
-        if str(export_or_not.lower()) == "yes":
-            info_forexport(stu_id,users)
-            #for different name file 1,2,3,4...
-            i=0
-            while True: #for checking the num of file exist
-                performance_summarytxt= f"student performance summary({i}).txt"
+        export_or_not = input("Do you want to export your performance summary file? (yes/no): ").strip().lower()
+        if export_or_not == "yes":
+            # Determine file name
+            i = 0
+            while True:
+                performance_summarytxt = f"student_performance_summary({i}).txt"
                 fullpathtxt = file_path(performance_summarytxt)
                 if not os.path.exists(fullpathtxt):
                     break
-                i=i+1
+                i += 1
 
-            #create file in the specific path
             with open(fullpathtxt, "w") as file:
                 file.write(f"ID: {stu_id}\n")
                 file.write(f"Name: {student['name']}\n")
                 file.write(f"Email: {student['email']}\n")
-                file.write(f"Current Semester: {student['semester']}\n\n")
-
+                file.write(f"Semester: {semester}\n\n")
+            
                 for c in courses:
+                    # Find the grade for this course
                     grade_record = next(
-                    (g for g in grades if g["course_code"] == c["course_code"] and g["semester"] == current_semester),
-                    None
+                        (g for g in semester_grades if g["course_code"] == c["course_code"]),
+                        None
                     )
                     grade_str = grade_record["marks"] if grade_record else "N/A"
                     file.write(f"{c['course_code']} - {c['course_name']} | Grade: {grade_str}\n")
-                
+
             print("exported file, you can check your file in ")
             print(fullpathtxt)
-            exit_program()
-            break
 
         elif str(export_or_not.lower()) == "no":
             print("returning to main page...")

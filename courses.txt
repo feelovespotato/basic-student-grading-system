@@ -11,3 +11,5 @@ CSC110,Discrete Mathematics,5
 
 21,CO,3
 30,CC,3
+CSC1034,OC,2
+EC,KO,2
