@@ -531,11 +531,23 @@ def main():
         choice = str(input("Choose: ")).strip().lower()
 
         if choice == "1" or choice=="add student":
-            sem = input("Enter current semester for new student: ")
+            while True:
+                sem = input("Enter current semester for new student: ")
+                try:
+                    sem=int(sem)
+                    break
+                except ValueError:
+                    print("Value have to be a number")
             add_student(sem)
 
         elif choice == "2"or choice=="delete student":
-            sem = input("Enter the current semester of student to delete: ")
+            while True:
+                sem = input("Enter current semester for new student: ")
+                try:
+                    sem=int(sem)
+                    break
+                except ValueError:
+                    print("Value have to be a number")
             delete_student_in_semester(sem)
 
         elif choice == "3"or choice=="search student":
@@ -579,7 +591,7 @@ def main():
         print("1. Add Course")
         print("2. Delete Course")
         print("3. Search Course")
-        print(f"4. export  semester report from Semester 1 to {current_sem}")
+        print(f"4. export  semester report from Semester 1 to {selected_semester}")
         print("0. Exit")
 
         choice = input("Choose: ").strip().lower()
