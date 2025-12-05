@@ -29,12 +29,6 @@ def load_data():
         print("File not found!")
         return []
 
-def save_data(records):
-    with open(file_path("grades.txt"), "w") as file:
-        for r in records:
-            file.write(f"{r["student_id"]},{r["semester"]},{r["course_id"]},{r["marks"]}\n")
-            print("Data saved!")
-
 def grade_conversion_letter(marks):
     if marks >= 80:
         return "A+"
@@ -157,22 +151,16 @@ def display_performance(records): # highest, lowest, average marks
 
         print(f"Course: {course_id}: Highest = {marks_max}, Lowest = {marks_min}, Average = {average_marks}")
 
+
+def save_data(records): # when saving txt will also incl grade letter after marks
+    with open(file_path("grades2.txt"), "w") as file:
+        for r in records:
+            letter_grade = grade_conversion_point(r["marks"])
+            file.write(f"{r["student_id"]},{r["semester"]},{r["course_id"]},{r["marks"]},{r["letter_grade"]}\n")
+            print("Data saved!")
+
 def main():
     records = load_data()
-    print("Menu")
+    save_data(records)
 
-
-
-
-if __name__ == "__main__":
-    records = load_data()
-
-    student_id = 509010
-    semester = 1
-    course_id = "CSC101"
-    marks = 10
-
-
-display_performance(records)
-print(calc_gpa(records, student_id, semester))
-print(calc_cgpa(records, student_id))
+main()
