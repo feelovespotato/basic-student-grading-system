@@ -9,8 +9,10 @@ def load_data():
     grade_record = []
 
     try:
-        with open(file_path("grades2.txt"), "r") as file:
+        with open(file_path("grades.txt"), "r") as file:
             for line in file:
+                if not line.strip():
+                    continue
 
                 parts = [p.strip() for p in line.split(',')]
                 student_id, semester, course_id, marks = parts[:4]
@@ -153,16 +155,17 @@ def display_performance(records): # highest, lowest, average marks
 
 
 def save_data(records): # when saving txt will also incl grade letter after marks
-    with open(file_path("grades2.txt"), "w") as file:
+    with open(file_path("grades.txt"), "w") as file:
         for r in records:
-            letter_grade = grade_conversion_point(r["marks"])
-            file.write(f"{r["student_id"]},{r["semester"]},{r["course_id"]},{r["marks"]},{r["letter_grade"]}\n")
+            letter_grade = grade_conversion_letter(r["marks"])
+            file.write(f"{r["student_id"]},{r["semester"]},{r["course_id"]},{r["marks"]},{letter_grade}\n")
             print("Data saved!")
 
 def main():
     records = load_data()
     save_data(records)
 
-main()
+if __name__ == "__main__":
+    main()
 
 # only for overwriting grade.txt with grade letter (automation)
