@@ -274,6 +274,9 @@ def delete_grade_specific_student(stu_id, course_id, selected_semester):
     while True:
         confirm = input(f"Are you sure you want to delete grade for {course_id}? (yes/no): ").strip().lower()
 
+        if confirm == "yes":
+            break
+
         if confirm == "no":
             print("Grade deletion cancelled.")
             return
@@ -282,7 +285,6 @@ def delete_grade_specific_student(stu_id, course_id, selected_semester):
             print("please answer yes or no only")
             time.sleep(1)
             clear_terminal()
-            break
 
     records = load_data()
     success = delete_grade(records, stu_id, course_id, selected_semester)
@@ -688,7 +690,7 @@ def info_forexport(stu_id,users):
 def main():
     print("Welcome to student grading system!")
     while True:
-        print("Menu")       
+        print("\nMenu")
         print("1. Add Student")
         print("2. Delete Student")
         print("3. Search Student & View Performance Report")
@@ -766,9 +768,11 @@ def main():
         print(f"\n--- COURSE MENU (Semester {selected_semester}) ---")
         print("1. Add Course")
         print("2. Delete Course")
-        print("3. Analyze Course")
-        print("4. Search Course")
-        print(f"5. export semester report for {selected_semester}")
+        print("3. Update Grade") # NEW
+        print("4. Delete Grade for Specific Course") # NEW
+        print("5. Analyze Course")
+        print("6. Search Course")
+        print(f"7. export semester report for {selected_semester}")
         print("0. Exit")
 
         choice = input("Choose: ").strip().lower()
@@ -779,15 +783,21 @@ def main():
         elif choice == "2" or choice == "delete course":
             delete_course_menu(selected_semester)
 
-        elif choice == "3" or choice == "analyze":
+        elif choice == "3" or choice == "update grade":
+            update_grade_menu(stu_id, selected_semester)
+
+        elif choice == "4" or choice == "delete grade":
+            delete_grade_specific_student(stu_id, selected_semester)
+
+        elif choice == "5" or choice == "analyze":
             cou = input("Enter the course ID you want to analyze: ").upper().strip()
             course_performance_summary(cou, selected_semester)
 
-        elif choice == "4" or choice == "search course":
+        elif choice == "6" or choice == "search course":
             search_course(selected_semester)
             clear_terminal()
 
-        elif choice == "5" or choice == "export current semester report":
+        elif choice == "7" or choice == "export current semester report":
             users = loaddstudent_file()
             export_performance_report(stu_id,selected_semester,users)
             break
