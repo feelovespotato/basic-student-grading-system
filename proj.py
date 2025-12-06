@@ -2,6 +2,18 @@ import os
 import sys
 import time
 
+from grade_manager import(
+    grade_conversion_letter,
+    grade_conversion_point,
+    calc_gpa,
+    calc_cgpa,
+    add_grade,
+    delete_grade,
+    update_grade,
+    load_data,
+    save_data
+)
+
 def file_path(*path_parts):
     folder_basepath = os.path.dirname(__file__)
     return os.path.join(folder_basepath,*path_parts)
@@ -183,7 +195,7 @@ def delete_course_menu(selected_semester):
 
 
 # Function to add course
-def add_course(stu_id,selected_semester):
+def add_course_with_grade(stu_id, selected_semester):
     course_id = input("Input new course ID: ").strip().upper()
     if course_exist(stu_id,course_id):
         print("ERROR! Course already exists.")
@@ -201,11 +213,109 @@ def add_course(stu_id,selected_semester):
         except ValueError:
             print("Invalid input! must be number")
 
+    # by andy / to calc grade letter& points
+    letter_grade = grade_conversion_letter(mark_value)
+    grade_point = grade_conversion_point(letter_grade)
+
     new_course = f"{stu_id},{course_id},{name},{selected_semester}"
+    write_file(file_path("courses.txt"), [new_course])
+
+    """
     new_marks= f"{stu_id},{selected_semester},{course_id},{mark}"
     write_file(file_path("grades.txt"), [new_marks])
-    write_file(file_path("courses.txt"), [new_course])
+    """
+
+    # by andy / use add_grade func to save instead of ^^
+
     print("Course added successfully.")
+    print()
+
+# to update students grade specific course
+def update_grade_menu(stu_id, selected_semester):
+    course_id = input("Input course ID: ").strip().lower()
+
+    if not(course_exist(stu_id,course_id)):
+        print("ERROR! Course does not exist.")
+        return
+
+    while True:
+        new_mark = input("Enter new mark: ").strip()
+        try:
+            new_mark = int(new_mark)
+            if 0 <= new_mark <= 100:
+                break
+            else:
+                print("Invalid mark, have to be 0-100")
+        except ValueError:
+            print("Invalid input! must be number")
+
+    letter_grade = grade_conversion_letter(new_mark)
+    grade_points = grade_conversion_point(letter_grade)
+
+    records = load_data()
+    bool_successs = update_grade(records, stu_id, course_id, new_mark)
+
+    if bool_successs:
+        print("Successfully updated grade.")
+        print(f"New mark: {new_mark}, Grade: {letter_grade}, Points: {grade_points}")
+
+    else:
+        print("Grade not found hence not updated.")
+
+
+# delete grade
+def delete_grade_specific_student(stu_id, course_id, selected_semester):
+    course_id = input("Input course ID to delete grade: ").strip()
+
+    if not (course_exist(stu_id, course_id)):
+        print("ERROR! Course does not exist.")
+        return
+
+    while True:
+        confirm = input(f"Are you sure you want to delete grade for {course_id}? (yes/no): ").strip().lower()
+
+        if confirm == "no":
+            print("Grade deletion cancelled.")
+            return
+
+        else:
+            print("please answer yes or no only")
+            time.sleep(1)
+            clear_terminal()
+            break
+
+    records = load_data()
+    success = delete_grade(records, stu_id, course_id, selected_semester)
+
+    if success:
+        print("Successfully deleted grade.")
+
+        # remove the student from the specific course in course.txt
+        courses = read_file(file_path("courses.txt"))
+        updated_courses = []
+
+        for line in courses:
+            parts = line.split(",")
+            # check if all the id match, then skip that line to append
+            if len(parts) >= 4:
+                if (parts[0].strip() == stu_id and
+                        parts[1].strip() == course_id and
+                        int(parts[3].strip()) == selected_semester):
+                    continue
+                else:
+                    updated_courses.append(line)
+            else:
+                updated_courses.append(line)
+
+        with open (file_path("courses.txt"), "w") as f:
+            for item in updated_courses:
+                f.write(item + "\n")
+
+    else:
+        print("Grade not found hence not deleted.")
+
+
+
 # Search course by id or name.
 def search_course(selected_semester):
     keyw = input("Enter Course ID or Name to search: ").strip().lower()
@@ -301,10 +411,28 @@ def display_individual_performance(selected_semester):
 
         if sem < selected_semester:       # <-- sem 1 to n-1
             found_any = True
-            print(f"Semester {sem} | Course: {course} | Score: {score}")
+            letter_grade = grade_conversion_letter(score)
+            print(f"Semester {sem} | Course: {course} | Score: {score} | Grade: {letter_grade}")
 
     if not found_any:
         print("Results N/A.")
+
+    records = load_data()
+
+    semester_gpas = calc_gpa(records, stu_id, selected_semester)
+    if selected_semester in semester_gpas:
+        print(f"GPA for semester {selected_semester}: {semester_gpas[selected_semester]}")
+
+    else:
+        print(f"No grade gpa found for sem {selected_semester}")
+
+    cgpa = calc_cgpa(records, stu_id)
+    print(f"CGPA (All semesters): {cgpa}")
+
+    if semester_gpas: # show gpas history (past sem)
+        print(f"Past semester GPA history")
+        for sem, gpa in sorted(semester_gpas.items()):
+            print(f"Semester {sem} | GPA: {gpa}")
 
 
 def course_performance_summary(course_id, selected_semester):
@@ -348,11 +476,17 @@ def course_performance_summary(course_id, selected_semester):
     avg_mark = sum(marks) / len(marks)
     highest = max(marks)
     lowest = min(marks)
+
+    # use imported convert func
+    avg_letter = grade_conversion_letter(avg_mark)
+    avg_points = grade_conversion_point(avg_letter)
     
     print(f"Students Enrolled: {len(marks)}")
     print(f"Average Mark: {avg_mark:.2f}")
     print(f"Highest Mark: {highest}")
     print(f"Lowest Mark: {lowest}")
+    print(f"Average Letter Grade: {avg_letter}")
+    print(f"Average Points: {avg_points}")
 
     from grade_calc import GradeSystem
     grade_obj = GradeSystem(None, None,  avg_mark)
@@ -557,7 +691,7 @@ def main():
         print("Menu")       
         print("1. Add Student")
         print("2. Delete Student")
-        print("3. Search Student")
+        print("3. Search Student & View Performance Report")
         print("4. Login")
         print("0. Exit (you can exit program anytime)")
         choice = str(input("Choose: ")).strip().lower()
@@ -640,7 +774,7 @@ def main():
         choice = input("Choose: ").strip().lower()
 
         if choice == "1" or choice == "add course":
-            add_course(stu_id,selected_semester)
+            add_course_with_grade(stu_id, selected_semester)
 
         elif choice == "2" or choice == "delete course":
             delete_course_menu(selected_semester)
