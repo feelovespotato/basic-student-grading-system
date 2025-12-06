@@ -13,7 +13,6 @@ def write_file(file_name, data_list):
         with open(file_name, "a") as x:
             for line in data_list:
                 x.write("\n" + line if x.tell() else line + "\n")
-        print(f"Data written to {file_name}")
     except Exception as e:
         print(f"Error writing {file_name}: {e}")
         return []
@@ -23,7 +22,6 @@ def read_file(file_name):
     try:
         with open(file_name, "r") as f:
             lines = [line.strip() for line in f.readlines()]
-        print(f"Data read from {file_name}")
         return lines
     except FileNotFoundError:
         print(f"Warning: {file_name} not found! Returning empty list.")
@@ -112,7 +110,7 @@ def student_semester(stu_id, semester):
     students = read_file(file_path("students.txt"))
     for s in students:
         parts = s.split(",")
-        if len(parts) >= 4 and parts[0].strip() == stu_id and parts[3].strip() == semester:
+        if len(parts) >= 4 and parts[0].strip() == stu_id and int(parts[3].strip()) == semester:
             return True
     return False
 
@@ -153,15 +151,17 @@ def delete_student_in_semester(selected_semester):
 
 # Function to delete course.
 def delete_course_menu(selected_semester):
-    course_id = input("Please input course ID to be deleted: ").strip()
+    course_id = input("Please input course ID to be deleted: ").strip().upper()
     courses= read_file(file_path("courses.txt"))
+    grades = read_file(file_path("grades.txt"))
     updated_courses = []
+    updated_grades = []
     course_found = False
     for x in courses:
         parts = x.split(",")
-        if len(parts) >= 3:
-            c_id = parts[0].strip()
-            c_sem = parts[2].strip()
+        if len(parts) >= 4:
+            c_id = parts[1].strip().upper()
+            c_sem = int(parts[3].strip())
 
             # if course matches ID & semester → skip (delete)
             if c_id == course_id and c_sem == selected_semester:
@@ -169,6 +169,7 @@ def delete_course_menu(selected_semester):
                 continue
 
         updated_courses.append(x)
+        
 
     if not course_found:
         print(f"ERROR! Course {course_id} not found in Semester {selected_semester}.")
@@ -183,11 +184,11 @@ def delete_course_menu(selected_semester):
 
 # Function to add course
 def add_course(stu_id,selected_semester):
-    course_id = input("Input new course ID: ").strip()
+    course_id = input("Input new course ID: ").strip().upper()
     if course_exist(stu_id,course_id):
         print("ERROR! Course already exists.")
         return
-    name = input("Enter course name: ").strip()
+    name = input("Enter course name: ").strip().upper()
     while True:
         mark=input(f"Enter student {stu_id} mark on this course (0-100): ").strip()
         try:
@@ -212,7 +213,8 @@ def search_course(selected_semester):
     found = False
     for x in courses:
         parts= x.split(",")
-        if len(parts) >= 3 and parts[2].strip() == selected_semester:
+        if len(parts) >= 4 and int(parts[3]) == selected_semester:
+            print("course info as below: ")
             if keyw in x.lower():
                 print(x)
                 found = True
@@ -266,11 +268,11 @@ def display_individual_performance(selected_semester):
     stu_id = search_student(selected_semester)
     
     if stu_id is None:
-        print("Cannot display performance. Student not found.")
+        print("No info to display. Student not found.")
         return
     
-    # read grades2.txt
-    with open(("basic-student-grading-system/grades2.txt"), "r") as f:
+    # read grades.txt
+    with open((file_path("grades.txt")), "r") as f:
         lines = f.readlines()
 
     student_record = []
@@ -306,11 +308,11 @@ def display_individual_performance(selected_semester):
 
 
 def course_performance_summary(course_id, selected_semester):
-    course_id = course_id.upper()
+    course_id = course_id.upper().strip()
     print(f"\n---COURSE PERFORMANCE FOR {course_id}---")
 
     # read the file
-    with open(file_path("grades2.txt"), "r") as f:
+    with open(file_path("grades.txt"), "r") as f:
         lines = f.readlines()     
 
     #gather marks
@@ -354,7 +356,8 @@ def course_performance_summary(course_id, selected_semester):
 
     from grade_calc import GradeSystem
     grade_obj = GradeSystem(None, None,  avg_mark)
-    print(f"Overall letter grade: {grade_obj.grade}")                                                                                 
+    print(f"Overall letter grade: {grade_obj.grade}")  
+    time.sleep(2)                                                                               
     
 #for cleaning terminal
 def clear_terminal():
@@ -508,6 +511,7 @@ def export_performance_report(stu_id,semester,users):
                 
             print("exported file, you can check your file in ")
             print(fullpathtxt)
+            time.sleep(1)
             exit_program()
 
         elif str(export_or_not.lower()) == "no":
@@ -517,6 +521,10 @@ def export_performance_report(stu_id,semester,users):
             main()
             break
 
+        elif str(export_or_not.lower()) == "exit" or str(export_or_not.lower())== "quit":
+            exit_program()
+            break
+
         else: 
             print("please answer yes or no only")
             time.sleep(1)
@@ -524,9 +532,10 @@ def export_performance_report(stu_id,semester,users):
     
 def info_forexport(stu_id,users):
     student = users[stu_id]
-    courses = loadcourse_file(student['semester'])
+    courses = loadcourse_file(stu_id,student['semester'])
     grades = loadgrade_file(stu_id)
 
+    clear_terminal()
     print("exporting information below:")
     print(f"ID: {stu_id}")
     print(f"Name: {student['name']}")
@@ -565,6 +574,7 @@ def main():
 
         elif choice == "2"or choice=="delete student":
             while True:
+                print("for verification")
                 sem = input("Enter the current semester of student to delete: ")
                 if len(sem) != 1:
                     print("Input has to be a single digit")
@@ -593,7 +603,7 @@ def main():
         elif choice == "4"or choice=="login":
             break
 
-        elif choice == "0"or choice=="exit":
+        elif choice == "0"or choice=="exit" or choice == "quit":
             clear_terminal()
             print("Exiting program...")
             exit_program()
@@ -624,7 +634,7 @@ def main():
         print("2. Delete Course")
         print("3. Analyze Course")
         print("4. Search Course")
-        print(f"5. export semester report from Semester 1 to {selected_semester}")
+        print(f"5. export semester report for {selected_semester}")
         print("0. Exit")
 
         choice = input("Choose: ").strip().lower()
@@ -636,18 +646,19 @@ def main():
             delete_course_menu(selected_semester)
 
         elif choice == "3" or choice == "analyze":
-            cou = input("Enter the course you want to analyze: ").upper()
+            cou = input("Enter the course ID you want to analyze: ").upper().strip()
             course_performance_summary(cou, selected_semester)
 
         elif choice == "4" or choice == "search course":
             search_course(selected_semester)
+            clear_terminal()
 
         elif choice == "5" or choice == "export current semester report":
             users = loaddstudent_file()
             export_performance_report(stu_id,selected_semester,users)
             break
 
-        elif choice == "0" or choice == "exit":
+        elif choice == "0" or choice == "exit" or choice == "quit":
             print("Exiting...")
             exit_program()
             return
