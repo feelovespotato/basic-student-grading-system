@@ -65,9 +65,9 @@ def update_grade(records, student_id, course_id, marks):
 
     return False
 
-def delete_grade(records, student_id, course_id):
+def delete_grade(records, student_id, course_id, semester):
     for r in records:
-        if r["student_id"] == student_id and r["course_id"] == course_id:
+        if r["student_id"] == student_id and r["course_id"] == course_id and r["semester"] == semester:
             records.remove(r)
             save_data(records)
             return True
