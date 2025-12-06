@@ -164,3 +164,5 @@ def main():
     save_data(records)
 
 main()
+
+# only for overwriting grade.txt with grade letter (automation)
