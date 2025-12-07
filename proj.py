@@ -73,22 +73,6 @@ def delete_student(stu_id):
 
     print("Student deleted successfully.")
 
-
-# Function for delete course + its grades.
-def delete_course(course_id):
-    # Delete from courses.txt
-    courses = read_file(file_path("courses.txt"))
-    new_list = []
-
-    for line in courses:
-        parts = line.split(",")
-        if parts[0].strip() != course_id:
-            new_list.append(line)
-
-    with open(file_path("courses.txt"), "w") as f:
-        for item in new_list:
-            f.write(item + "\n")
-
     # Remove grades for this course from grades.txt
     grades = read_file(file_path("grades.txt"))
     new_grade_list = []
@@ -169,8 +153,8 @@ def delete_course_menu(selected_semester):
     updated_courses = []
     updated_grades = []
     course_found = False
-    for x in courses:
-        parts = x.split(",")
+    for line in courses:
+        parts = line.split(",")
         if len(parts) >= 4:
             c_id = parts[1].strip().upper()
             c_sem = int(parts[3].strip())
@@ -179,8 +163,19 @@ def delete_course_menu(selected_semester):
             if c_id == course_id and c_sem == selected_semester:
                 course_found = True
                 continue
+            updated_courses.append(line)
+            #delete grades in the deleted course
+    for line in grades:
+        parts = line.split(",")
+        if len(parts) >= 4:
+            g_id = parts[2].strip().upper()
+            g_sem = int(parts[1].strip())
 
-        updated_courses.append(x)
+            # if course matches ID & semester → skip (delete)
+            if g_id == course_id and g_sem == selected_semester:
+                continue
+
+            updated_grades.append(line)
         
 
     if not course_found:
@@ -188,6 +183,9 @@ def delete_course_menu(selected_semester):
         return
     with open(file_path("courses.txt"), "w") as f:
         for item in updated_courses:
+            f.write(item + "\n")
+    with open(file_path("grades.txt"), "w") as f:
+        for item in updated_grades:
             f.write(item + "\n")
 
     print(f"Course {course_id} deleted successfully from Semester {selected_semester}")
