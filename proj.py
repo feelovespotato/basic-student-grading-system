@@ -634,7 +634,7 @@ def main():
         print("2. Delete Course")
         print("3. Analyze Course")
         print("4. Search Course")
-        print(f"5. export semester report for {selected_semester}")
+        print(f"5. export semester report for semester {selected_semester}")
         print("0. Exit")
 
         choice = input("Choose: ").strip().lower()
