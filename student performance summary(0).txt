@@ -1,7 +1,0 @@
-ID: 25121211
-Name: Coshin
-Email: Coshinlee@gmail.com
-Current Semester: 3
-
-CSC102 - CO | Grade: N/A
-COS12 - DE | Grade: N/A
