@@ -148,6 +148,8 @@ def delete_student_in_semester(selected_semester):
 # Function to delete course.
 def delete_course_menu(selected_semester):
     course_id = input("Please input course ID to be deleted: ").strip().upper()
+    if course_id == "QUIT" or course_id == "EXIT":
+        exit_program()
     courses= read_file(file_path("courses.txt"))
     grades = read_file(file_path("grades.txt"))
     updated_courses = []
@@ -195,6 +197,8 @@ def delete_course_menu(selected_semester):
 # Function to add course
 def add_course_with_grade(stu_id, selected_semester):
     course_id = input("Input new course ID: ").strip().upper()
+    if course_id == "QUIT" or course_id == "EXIT":
+        exit_program()
     if course_exist(stu_id,course_id):
         print("ERROR! Course already exists.")
         return
@@ -230,6 +234,8 @@ def add_course_with_grade(stu_id, selected_semester):
 # to update students grade specific course
 def update_grade_menu(stu_id, selected_semester):
     course_id = input("Input course ID: ").strip().lower()
+    if course_id == "quit" or course_id == "exit":
+        exit_program()
 
     if not(course_exist(stu_id,course_id)):
         print("ERROR! Course does not exist.")
@@ -318,6 +324,8 @@ def delete_grade_specific_student(stu_id, course_id, selected_semester):
 # Search course by id or name.
 def search_course(selected_semester):
     keyw = input("Enter Course ID or Name to search: ").strip().lower()
+    if keyw == "quit" or keyw == "exit":
+        exit_program()
     courses = read_file(file_path("courses.txt"))
     found = False
     for x in courses:
@@ -702,6 +710,8 @@ def main():
         if choice == "1" or choice=="add student":
             while True:
                 sem = input("Enter current semester for new student: ")
+                if sem.lower() == "quit" or sem.lower() == "exit":
+                    exit_program()
                 try: 
                     sem=int(sem)
                     break
@@ -713,6 +723,8 @@ def main():
             while True:
                 print("for verification")
                 sem = input("Enter the current semester of student to delete: ")
+                if sem.lower() == "quit" or sem.lower() == "exit":
+                    exit_program()
                 if len(sem) != 1:
                     print("Input has to be a single digit")
                     continue
@@ -737,6 +749,8 @@ def main():
     while True:
         print("\n--- LOGIN ---")
         stu_id = str(input("Enter your Student ID: ")).strip()
+        if stu_id.lower() == "quit" or stu_id.lower() == "exit":
+            exit_program()
         if student_exist(stu_id):
             print(f"Login successful! Welcome, Student {stu_id}")
             break
