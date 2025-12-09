@@ -17,7 +17,7 @@ def load_data():
                 parts = [p.strip() for p in line.split(',')]
                 student_id, semester, course_id, marks = parts[:4]
 
-                student_id = int(student_id)
+                student_id = student_id
                 semester = int(semester)
                 course_id = str(course_id)
                 marks = float(marks)
@@ -159,7 +159,7 @@ def save_data(records): # when saving txt will also incl grade letter after mark
         for r in records:
             letter_grade = grade_conversion_letter(r["marks"])
             file.write(f"{r["student_id"]},{r["semester"]},{r["course_id"]},{r["marks"]},{letter_grade}\n")
-            print("Data saved!")
+        print("Data saved!")
 
 def main():
     records = load_data()

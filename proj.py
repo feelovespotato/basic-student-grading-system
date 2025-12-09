@@ -218,10 +218,9 @@ def add_course_with_grade(stu_id, selected_semester):
     new_course = f"{stu_id},{course_id},{name},{selected_semester}"
     write_file(file_path("courses.txt"), [new_course])
 
-    """
     new_marks= f"{stu_id},{selected_semester},{course_id},{mark}"
     write_file(file_path("grades.txt"), [new_marks])
-    """
+
 
     # by andy / use add_grade func to save instead of ^^
 
@@ -324,9 +323,12 @@ def search_course(selected_semester):
     for x in courses:
         parts= x.split(",")
         if len(parts) >= 4 and int(parts[3]) == selected_semester:
-            print("course info as below: ")
             if keyw in x.lower():
-                print(x)
+                print("course info as below: ")
+                print(f"Student ID: {parts[0]}")
+                print(f"Course ID: {parts[1]}")
+                print(f"Course Name: {parts[2]}")
+                print(f"Semester: {parts[3]}")
                 found = True
     if not found:
         print(f"No matching course found in semester {selected_semester}")
@@ -338,17 +340,30 @@ def search_student(selected_semester):
     students = read_file(file_path("students.txt"))
     
     for c in students:
-        parts= c.split(",")
-        if len(parts) >= 4 and int(parts[3].strip()) == selected_semester:
-            if keyw in c.lower():
-                print(
-                    f"\nStudent found."
-                    f"\nID: {parts[0]}"
-                    f"\nName: {parts[1]}"
-                    f"\nEmail: {parts[2]}"
-                    f"\nSemester: {parts[3]}"
-                )
-                return parts[0] 
+        parts = [p.strip() for p in c.split(",")]
+        if len(parts) < 4:
+            continue
+
+        stu_id = parts[0]
+        name = parts[1]
+        email = parts[2]
+        sem = int(parts[3])
+
+        # Check semester matches
+        if sem != selected_semester:
+            continue
+
+        # Check if input matches ID exactly or name (substring, case-insensitive)
+        if keyw == stu_id.lower() or keyw in name.lower():
+            print(
+                f"\nStudent found."
+                f"\nID: {stu_id}"
+                f"\nName: {name}"
+                f"\nEmail: {email}"
+                f"\nSemester: {sem}"
+            )
+            return stu_id 
+            
     print(f"No matching student found in semester {selected_semester}")
     return None
 #get current semester
@@ -374,65 +389,49 @@ def select_semester(current_semester):
         return semester
     
 #part 4 - darvesh
-def display_individual_performance(selected_semester):
-    stu_id = search_student(selected_semester)
-    
+def display_individual_performance(selected_semester,stu_id):
     if stu_id is None:
         print("No info to display. Student not found.")
         return
-    
-    # read grades.txt
-    with open((file_path("grades.txt")), "r") as f:
-        lines = f.readlines()
+    # read grades.txt using Andy's one consistent
+    lines = load_data()
 
-    student_record = []
+    print("\n--- Past Academic Performance (Sem 1 to Sem", selected_semester - 1, ") ---")
 
+    found = False
     # Collect all grade lines for this student
     for line in lines:
-        parts = [p.strip() for p in line.split(",")]
-        
-        # parts = [ID, semester, code, mark]
-        if parts[0] == stu_id:
-            student_record.append(parts)
-
-    if not student_record:
-        print("No grades found for this student.")
-        return
-
-
-    print("\n--- Academic Performance (Sem 1 to Sem", selected_semester - 1, ") ---")
-
-    found_any = False
-
-    for record in student_record:
-        sem = int(record[1])      # semester
-        course = record[2]        # CSC101
-        score = float(record[3])  # marks
-
-        if sem < selected_semester:       # <-- sem 1 to n-1
-            found_any = True
-            letter_grade = grade_conversion_letter(score)
+        if line["student_id"] == stu_id and line["semester"] <= selected_semester:
+            found = True
+            sem = int(line["semester"]) 
+            course= line["course_id"]
+            score = line["marks"]
+            letter_grade=grade_conversion_letter(score)
             print(f"Semester {sem} | Course: {course} | Score: {score} | Grade: {letter_grade}")
 
-    if not found_any:
-        print("Results N/A.")
+    if not found:
+        print("No grades found for this student.")
+        return
+    
+    #calculate GPA 
+    semester_gpas = calc_gpa(lines, stu_id, selected_semester)
 
-    records = load_data()
-
-    semester_gpas = calc_gpa(records, stu_id, selected_semester)
     if selected_semester in semester_gpas:
         print(f"GPA for semester {selected_semester}: {semester_gpas[selected_semester]}")
 
     else:
         print(f"No grade gpa found for sem {selected_semester}")
 
-    cgpa = calc_cgpa(records, stu_id)
-    print(f"CGPA (All semesters): {cgpa}")
+    #calculate cgpa
+    cgpa = calc_cgpa(lines, stu_id)
+    print(f"CGPA (All semesters): {cgpa:.2f}") #keep 2 decimal place
 
-    if semester_gpas: # show gpas history (past sem)
+    past_gpas = {sem: gpa for sem, gpa in semester_gpas.items() if sem < selected_semester}
+    if past_gpas: # show gpas history (past sem)
         print(f"Past semester GPA history")
         for sem, gpa in sorted(semester_gpas.items()):
-            print(f"Semester {sem} | GPA: {gpa}")
+            print(f"Semester {sem} | GPA: {gpa:2f}")
+            time.sleep(2)
 
 
 def course_performance_summary(course_id, selected_semester):
@@ -449,13 +448,16 @@ def course_performance_summary(course_id, selected_semester):
 
     for line in lines:
         parts = [p.strip() for p in line.split(",")]
-        if len(parts) != 4:
+        if len(parts) < 4:
             continue
   
 
         sem = int(parts[1])
-        course = parts[2]
-        score = float(parts[3])
+        course = parts[2].strip().upper()
+        try:
+            score = float(parts[3])
+        except ValueError:
+            continue
     
         if course == course_id and sem == selected_semester:
             course_found = True
@@ -467,10 +469,6 @@ def course_performance_summary(course_id, selected_semester):
     if not marks:
         print("No grades found for this course.")
         return
-    
-    
-
-    
     
     # Calculate stats
     avg_mark = sum(marks) / len(marks)
@@ -504,6 +502,7 @@ def exit_program():
         print(" do you want to continue student grading system? type (Yes/No)")
         exit_program_or_not= str(input("enter: ").strip().lower())
         if str(exit_program_or_not.lower()) == "yes":
+            clear_terminal()
             main()
         elif str(exit_program_or_not.lower())== "no":
             clear_terminal()
@@ -585,7 +584,7 @@ def loadgrade_file(stu_id):
         #grade = spliting[4]
         #gpa = spliting [5]
 
-        #get student id from part 2 
+        #get student id from part 2 (filtering)
         if studentid_infile == stu_id: 
             grades.append({
                     "semester": grade_sem,
@@ -603,20 +602,15 @@ def export_performance_report(stu_id,semester,users):
     student= users[stu_id]
     current_semester = semester #pass selexted semester into variable
     courses = loadcourse_file(stu_id,current_semester)
-    grades = loadgrade_file(stu_id)
-    #loop through every single grade for that particular sem
-    semester_grades = [g for g in grades if g["semester"] == current_semester]
-
-    for c in courses:
-    # find matching grade record for this course
-        grade_record = next(
-        (g for g in semester_grades if g["course_code"] == c["course_code"]),
-        None
-        )
-        marks_str = grade_record["marks"] if grade_record else "N/A"
+    
+    all_records = load_data()
+    #filter this student grade 
+    student_grades = [g for g in all_records if g["student_id"] == stu_id]
+    semester_gpas = calc_gpa(all_records, stu_id, current_semester)
+    cgpa = calc_cgpa(all_records, stu_id)
 
     while True:
-        export_or_not = input("do you want to export you performance summary file? (please answer yes or no): ").strip()
+        export_or_not = input("do you want to export current semester performance summary file? (please answer yes or no): ").strip()
         if str(export_or_not.lower()) == "yes":
             info_forexport(stu_id,users)
             #for different name file 1,2,3,4...
@@ -635,25 +629,35 @@ def export_performance_report(stu_id,semester,users):
                 file.write(f"Email: {student['email']}\n")
                 file.write(f"Current Semester: {student['semester']}\n\n")
 
-                for c in courses:
+                #loop through the dictionary list and check each course code and semester
+                for c in courses:  #course file dictionary loop 
                     grade_record = next(
-                    (g for g in grades if g["course_code"] == c["course_code"] and g["semester"] == current_semester),
-                    None
+                    (g for g in student_grades if g["course_id"] == c["course_code"] and g["semester"] == current_semester),
+                    None # if course and grade match
                     )
-                    grade_str = grade_record["marks"] if grade_record else "N/A"
-                    file.write(f"{c['course_code']} - {c['course_name']} | Grade: {grade_str}\n")
+                    if grade_record:
+                        marks= grade_record["marks"]
+                        letter = grade_conversion_letter(marks)
+                        file.write(f"{c['course_code']} - {c['course_name']} | Grade: {marks} | Grade: {letter}\n")
+                    else:
+                        file.write(f"{c['course_code']} - {c['course_name']} | Marks: N/A | Grade: N/A\n")
+
+                #gpa and cgpa 
+                gpa_str = f"{semester_gpas.get(current_semester, 0):.2f}"
+                file.write(f"\nGPA for semester {current_semester}: {gpa_str}\n")
+                file.write(f"CGPA (All semesters): {cgpa:.2f}\n")
                 
             print("exported file, you can check your file in ")
             print(fullpathtxt)
             time.sleep(1)
             exit_program()
+            break
 
         elif str(export_or_not.lower()) == "no":
             print("returning to main page...")
             time.sleep(1)
             clear_terminal()
-            main()
-            break
+            return
 
         elif str(export_or_not.lower()) == "exit" or str(export_or_not.lower())== "quit":
             exit_program()
@@ -691,8 +695,7 @@ def main():
         print("\nMenu")
         print("1. Add Student")
         print("2. Delete Student")
-        print("3. Search Student & View Performance Report")
-        print("4. Login")
+        print("3. Login")
         print("0. Exit (you can exit program anytime)")
         choice = str(input("Choose: ")).strip().lower()
 
@@ -719,22 +722,8 @@ def main():
                 except ValueError:
                     print("Value have to be Number")
             delete_student_in_semester(sem)
-
-        elif choice == "3"or choice=="search student":
-            while True:
-                sem = input("Enter the current semester of student to search: ")
-                if len(sem) != 1:
-                    print("Input has to be a single digit")
-                    continue
-                try: 
-                    sem= int(sem)
-                    break
-                except ValueError:
-                    print("Value have to be Number")
-
-            display_individual_performance(sem)
         
-        elif choice == "4"or choice=="login":
+        elif choice == "3"or choice=="login":
             break
 
         elif choice == "0"or choice=="exit" or choice == "quit":
@@ -768,9 +757,10 @@ def main():
         print("2. Delete Course")
         print("3. Update Grade") # NEW
         print("4. Delete Grade for Specific Course") # NEW
-        print("5. Analyze Course")
+        print("5. Analyze individual Course")
         print("6. Search Course")
-        print(f"7. export semester report for {selected_semester}")
+        print("7. Search View Past Performance Report")
+        print(f"8. export semester report for {selected_semester}")
         print("0. Exit")
 
         choice = input("Choose: ").strip().lower()
@@ -793,9 +783,12 @@ def main():
 
         elif choice == "6" or choice == "search course":
             search_course(selected_semester)
-            clear_terminal()
+            
 
-        elif choice == "7" or choice == "export current semester report":
+        elif choice == "7" or choice == "Search Student & View Performance Report" or choice == "search student" or choice == " view performance report":
+            display_individual_performance(selected_semester,stu_id)
+
+        elif choice == "8" or choice == "export current semester report":
             users = loaddstudent_file()
             export_performance_report(stu_id,selected_semester,users)
             break
