@@ -573,34 +573,6 @@ def loadcourse_file(stu_id,current_semester):
                 "course_name": course_name})
     return courses
 
-
-def loadgrade_file(stu_id):
-    grades= []
-
-    with open(file_path("grades.txt"),"r") as file :
-        data = file.readlines()
-    
-    for i in data:
-        i=i.strip()
-        if not i:
-            continue  # skip empty lines
-        spliting = i.split(',')
-        studentid_infile = spliting[0]
-        grade_sem = int(spliting[1])
-        course_num= spliting[2]
-        marks = spliting[3]
-        #grade = spliting[4]
-        #gpa = spliting [5]
-
-        #get student id from part 2 (filtering)
-        if studentid_infile == stu_id: 
-            grades.append({
-                    "semester": grade_sem,
-                    "course_code": course_num,
-                    "marks": marks,
-                    #"grade": grade,#"gpa": gpa,
-                    })
-    return grades
     
 def file_path(*path_parts):
     folder_basepath = os.path.dirname(__file__)
@@ -676,10 +648,8 @@ def export_performance_report(stu_id,semester,users):
             time.sleep(1)
             clear_terminal()
     
-def info_forexport(stu_id,users):
+def info_forexport(stu_id,users): #for import purpose
     student = users[stu_id]
-    courses = loadcourse_file(stu_id,student['semester'])
-    grades = loadgrade_file(stu_id)
 
     clear_terminal()
     print("exporting information below:")
@@ -688,13 +658,6 @@ def info_forexport(stu_id,users):
     print(f"Email: {student['email']}")
     print(f"Current semester: {student['semester']}")
 
-    for c in courses:
-        grade_record = next(
-            (g for g in grades if g["course_code"] == c["course_code"] and g["semester"] == student['semester']),
-            None
-        )
-        grade_str = grade_record["marks"] if grade_record else "N/A"
-        print(f"{c['course_code']} - {c['course_name']} | Grade: {grade_str}")
 
 # Main Menu function.
 def main():
