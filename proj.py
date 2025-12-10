@@ -585,7 +585,10 @@ def export_performance_report(stu_id,semester,users):
     
     all_records = load_data()
     #filter this student grade 
-    student_grades = [g for g in all_records if g["student_id"] == stu_id]
+    student_grades = []
+    for g in all_records:
+        if g["student_id"] == stu_id:
+            student_grades.append(g)
     semester_gpas = calc_gpa(all_records, stu_id, current_semester)
     cgpa = calc_cgpa(all_records, stu_id)
 
@@ -611,13 +614,14 @@ def export_performance_report(stu_id,semester,users):
 
                 #loop through the dictionary list and check each course code and semester
                 for c in courses:  #course file dictionary loop 
-                    grade_record = next(
-                    (g for g in student_grades if g["course_id"] == c["course_code"] and g["semester"] == current_semester),
-                    None # if course and grade match
-                    )
-                    if grade_record:
+                    grade_record = None
+                    for g in student_grades:
+                        if g["course_id"] == c["course_code"] and g["semester"] == current_semester: # if course and grade match
+                            grade_record = g  
+                            break
+                    if grade_record: #write in txt file
                         marks= grade_record["marks"]
-                        letter = grade_conversion_letter(marks)
+                        letter = grade_conversion_letter(marks) 
                         file.write(f"{c['course_code']} - {c['course_name']} | Grade: {marks} | Grade: {letter}\n")
                     else:
                         file.write(f"{c['course_code']} - {c['course_name']} | Marks: N/A | Grade: N/A\n")
