@@ -404,7 +404,10 @@ def display_individual_performance(selected_semester,stu_id):
     # read grades.txt using Andy's one consistent
     lines = load_data()
 
-    print("\n--- Past Academic Performance (Sem 1 to Sem", selected_semester - 1, ") ---")
+    if selected_semester != 1:
+        print("\n--- Past Academic Performance (Sem 1 to Sem", selected_semester, ") ---")
+    else:
+        print(("\n--- Past Academic Performance (Sem 1) ---"))
 
     found = False
     # Collect all grade lines for this student
