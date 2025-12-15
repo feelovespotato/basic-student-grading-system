@@ -222,7 +222,7 @@ def add_course_with_grade(stu_id, selected_semester):
     new_course = f"{stu_id},{course_id},{name},{selected_semester}"
     write_file(file_path("courses.txt"), [new_course])
 
-    new_marks= f"{stu_id},{selected_semester},{course_id},{mark}"
+    new_marks= f"{stu_id},{selected_semester},{course_id},{mark},{letter_grade}"
     write_file(file_path("grades.txt"), [new_marks])
 
 
