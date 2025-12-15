@@ -267,20 +267,20 @@ def update_grade_menu(stu_id, selected_semester):
 
 
 # delete grade
-def delete_grade_specific_student(stu_id, course_id, selected_semester):
-    course_id = input("Input course ID to delete grade: ").strip()
+def delete_grade_specific_student(stu_id, selected_semester):
+    course_id = input("Input course ID to delete grade: ").strip().upper()
 
     if not (course_exist(stu_id, course_id)):
         print("ERROR! Course does not exist.")
         return
 
     while True:
-        confirm = input(f"Are you sure you want to delete grade for {course_id}? (yes/no): ").strip().lower()
+        confirm = input(f"Are you sure you want to delete grade for {course_id}? (yes/no): ").strip().upper()
 
-        if confirm == "yes":
+        if confirm == "YES":
             break
 
-        if confirm == "no":
+        if confirm == "NO":
             print("Grade deletion cancelled.")
             return
 
