@@ -233,7 +233,7 @@ def add_course_with_grade(stu_id, selected_semester):
 
 # to update students grade specific course
 def update_grade_menu(stu_id, selected_semester):
-    course_id = input("Input course ID: ").strip().lower()
+    course_id = input("Input course ID: ").strip().upper()
     if course_id == "quit" or course_id == "exit":
         exit_program()
 
