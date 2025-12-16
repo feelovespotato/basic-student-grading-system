@@ -116,7 +116,7 @@ def course_exist(stu_id,course_id):
     course = read_file(file_path("courses.txt"))
     for c in course:
         parts = c.split(",")
-        if len(parts) >= 4 and parts[1].strip() == course_id and parts[0].strip()== stu_id:
+        if len(parts) >= 4 and parts[1].strip().upper() == course_id and parts[0].strip()== stu_id:
             return True
     return False
 
@@ -491,6 +491,7 @@ def course_performance_summary(course_id, selected_semester):
     avg_points = grade_conversion_point(avg_letter)
     
     print(f"Students Enrolled: {len(marks)}")
+    #need add student list
     print(f"Average Mark: {avg_mark:.2f}")
     print(f"Highest Mark: {highest}")
     print(f"Lowest Mark: {lowest}")
