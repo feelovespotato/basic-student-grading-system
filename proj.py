@@ -455,6 +455,7 @@ def course_performance_summary(course_id, selected_semester):
 
     #gather marks
     marks = []
+    student_ids = []
     course_found = False
 
     for line in lines:
@@ -462,7 +463,7 @@ def course_performance_summary(course_id, selected_semester):
         if len(parts) < 4:
             continue
   
-
+        stu_id = parts[0].strip()
         sem = int(parts[1])
         course = parts[2].strip().upper()
         try:
@@ -473,6 +474,7 @@ def course_performance_summary(course_id, selected_semester):
         if course == course_id and sem == selected_semester:
             course_found = True
             marks.append(score)
+            student_ids.append(stu_id)
 
     if not course_found:
         print("Course not found in your semester.")
@@ -480,6 +482,16 @@ def course_performance_summary(course_id, selected_semester):
     if not marks:
         print("No grades found for this course.")
         return
+    
+    students_data = read_file(file_path("students.txt"))
+    student_names = []
+
+    for stu_id in student_ids:
+        for student_line in students_data:
+            student_parts = student_line.split(",")
+            if len(student_parts) >= 2 and student_parts[0].strip() == stu_id:
+                student_names.append(f"{student_parts[1].strip()} ({stu_id})")
+                break
     
     # Calculate stats
     avg_mark = sum(marks) / len(marks)
@@ -490,7 +502,9 @@ def course_performance_summary(course_id, selected_semester):
     avg_letter = grade_conversion_letter(avg_mark)
     avg_points = grade_conversion_point(avg_letter)
     
-    print(f"Students Enrolled: {len(marks)}")
+    print(f"Students Enrolled ({len(student_names)}):")
+    for name in student_names:
+        print(f"  - {name}")
     #need add student list
     print(f"Average Mark: {avg_mark:.2f}")
     print(f"Highest Mark: {highest}")
