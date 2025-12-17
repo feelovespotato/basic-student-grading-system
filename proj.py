@@ -73,25 +73,6 @@ def delete_student(stu_id):
 
     print("Student deleted successfully.")
 
-    # Remove grades for this course from grades.txt
-    grades = read_file(file_path("grades.txt"))
-    new_grade_list = []
-
-    for g in grades:
-        parts = g.split(",")
-        if len(parts) < 3:
-            continue
-        c_id = parts[2].strip()
-
-        if c_id != course_id:
-            new_grade_list.append(g)
-
-    with open(file_path("grades.txt"), "w") as f:
-        for item in new_grade_list:
-            f.write(item + "\n")
-
-    print("Course deleted successfully.")
-
 # Part 2 – Goyu
 # Check if student ID exists in students.txt
 def student_exist(stu_id):
@@ -217,7 +198,6 @@ def add_course_with_grade(stu_id, selected_semester):
 
     # by andy / to calc grade letter& points
     letter_grade = grade_conversion_letter(mark_value)
-    grade_point = grade_conversion_point(letter_grade)
 
     new_course = f"{stu_id},{course_id},{name},{selected_semester}"
     write_file(file_path("courses.txt"), [new_course])
